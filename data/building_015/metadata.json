@@ -1,0 +1,32 @@
+{
+  "building_id": "building_015",
+  "source_file": "[ANONYMIZED]",
+  "num_floors": 4,
+  "floor_labels": [
+    "1",
+    "2",
+    "3",
+    "4"
+  ],
+  "total_nodes": 62,
+  "total_horizontal_edges": 66,
+  "total_vertical_edges": 32,
+  "node_classes_present": [
+    1,
+    2,
+    3,
+    6,
+    7,
+    8,
+    9,
+    10,
+    12,
+    13,
+    14,
+    16,
+    18,
+    19
+  ],
+  "has_basement": true,
+  "schema_version": "1.0"
+}

@@ -1,0 +1,2082 @@
+[
+  {
+    "floor_key": "building_005+B1",
+    "floor_label": "B1",
+    "num_nodes": 8,
+    "num_edges": 8,
+    "nodes": [
+      {
+        "id": "물탱크실_1",
+        "class_id": 5,
+        "class_name": "물탱크실",
+        "class_name_en": "Water Tank Room",
+        "instance_index": 1,
+        "is_external_context": false,
+        "is_vertical_core": false
+      },
+      {
+        "id": "물탱크실_2",
+        "class_id": 5,
+        "class_name": "물탱크실",
+        "class_name_en": "Water Tank Room",
+        "instance_index": 2,
+        "is_external_context": false,
+        "is_vertical_core": false
+      },
+      {
+        "id": "임대_1",
+        "class_id": 1,
+        "class_name": "임대",
+        "class_name_en": "Leasable Unit",
+        "instance_index": 1,
+        "is_external_context": false,
+        "is_vertical_core": false
+      },
+      {
+        "id": "화장실_1",
+        "class_id": 10,
+        "class_name": "화장실",
+        "class_name_en": "Restroom",
+        "instance_index": 1,
+        "is_external_context": false,
+        "is_vertical_core": false
+      },
+      {
+        "id": "화장실_2",
+        "class_id": 10,
+        "class_name": "화장실",
+        "class_name_en": "Restroom",
+        "instance_index": 2,
+        "is_external_context": false,
+        "is_vertical_core": false
+      },
+      {
+        "id": "E.V_1",
+        "class_id": 8,
+        "class_name": "E.V",
+        "class_name_en": "Elevator",
+        "instance_index": 1,
+        "is_external_context": false,
+        "is_vertical_core": true
+      },
+      {
+        "id": "창고_1",
+        "class_id": 12,
+        "class_name": "창고",
+        "class_name_en": "Storage",
+        "instance_index": 1,
+        "is_external_context": false,
+        "is_vertical_core": false
+      },
+      {
+        "id": "계단실_1",
+        "class_id": 9,
+        "class_name": "계단실",
+        "class_name_en": "Staircase",
+        "instance_index": 1,
+        "is_external_context": false,
+        "is_vertical_core": true
+      }
+    ],
+    "edges": [
+      {
+        "source": "물탱크실_1",
+        "target": "물탱크실_2",
+        "weight": 0.0
+      },
+      {
+        "source": "물탱크실_2",
+        "target": "임대_1",
+        "weight": 0.5
+      },
+      {
+        "source": "화장실_1",
+        "target": "임대_1",
+        "weight": 0.5
+      },
+      {
+        "source": "화장실_2",
+        "target": "임대_1",
+        "weight": 0.5
+      },
+      {
+        "source": "화장실_2",
+        "target": "E.V_1",
+        "weight": 0.0
+      },
+      {
+        "source": "E.V_1",
+        "target": "임대_1",
+        "weight": 0.5
+      },
+      {
+        "source": "창고_1",
+        "target": "계단실_1",
+        "weight": 0.5
+      },
+      {
+        "source": "계단실_1",
+        "target": "임대_1",
+        "weight": 0.5
+      }
+    ]
+  },
+  {
+    "floor_key": "building_005+1",
+    "floor_label": "1",
+    "num_nodes": 21,
+    "num_edges": 24,
+    "nodes": [
+      {
+        "id": "주변매스_1",
+        "class_id": 18,
+        "class_name": "주변매스",
+        "class_name_en": "Surrounding Mass",
+        "instance_index": 1,
+        "is_external_context": true,
+        "is_vertical_core": false,
+        "face": "S",
+        "offset": 126.0,
+        "is_surrounding_mass": true
+      },
+      {
+        "id": "공지_1",
+        "class_id": 16,
+        "class_name": "공지",
+        "class_name_en": "Open Space",
+        "instance_index": 1,
+        "is_external_context": true,
+        "is_vertical_core": false,
+        "face": "S",
+        "offset": 84.5,
+        "is_surrounding_mass": false
+      },
+      {
+        "id": "주차장_1",
+        "class_id": 19,
+        "class_name": "주차장",
+        "class_name_en": "Parking Lot",
+        "instance_index": 1,
+        "is_external_context": false,
+        "is_vertical_core": false
+      },
+      {
+        "id": "공지_4",
+        "class_id": 16,
+        "class_name": "공지",
+        "class_name_en": "Open Space",
+        "instance_index": 4,
+        "is_external_context": true,
+        "is_vertical_core": false,
+        "face": "N",
+        "offset": 84.5,
+        "is_surrounding_mass": false
+      },
+      {
+        "id": "홀_1",
+        "class_id": 6,
+        "class_name": "홀",
+        "class_name_en": "Hall / Lobby",
+        "instance_index": 1,
+        "is_external_context": false,
+        "is_vertical_core": false
+      },
+      {
+        "id": "부도로_1",
+        "class_id": 14,
+        "class_name": "부도로",
+        "class_name_en": "Secondary Road",
+        "instance_index": 1,
+        "is_external_context": true,
+        "is_vertical_core": false,
+        "face": "N",
+        "offset": 107.0,
+        "is_surrounding_mass": false
+      },
+      {
+        "id": "설비_2",
+        "class_id": 7,
+        "class_name": "설비",
+        "class_name_en": "MEP / Utility Room",
+        "instance_index": 2,
+        "is_external_context": false,
+        "is_vertical_core": false
+      },
+      {
+        "id": "설비_1",
+        "class_id": 7,
+        "class_name": "설비",
+        "class_name_en": "MEP / Utility Room",
+        "instance_index": 1,
+        "is_external_context": false,
+        "is_vertical_core": false
+      },
+      {
+        "id": "주변매스_2",
+        "class_id": 18,
+        "class_name": "주변매스",
+        "class_name_en": "Surrounding Mass",
+        "instance_index": 2,
+        "is_external_context": true,
+        "is_vertical_core": false,
+        "face": "W",
+        "offset": 126.0,
+        "is_surrounding_mass": true
+      },
+      {
+        "id": "공지_2",
+        "class_id": 16,
+        "class_name": "공지",
+        "class_name_en": "Open Space",
+        "instance_index": 2,
+        "is_external_context": true,
+        "is_vertical_core": false,
+        "face": "W",
+        "offset": 84.5,
+        "is_surrounding_mass": false
+      },
+      {
+        "id": "임대_2",
+        "class_id": 1,
+        "class_name": "임대",
+        "class_name_en": "Leasable Unit",
+        "instance_index": 2,
+        "is_external_context": false,
+        "is_vertical_core": false
+      },
+      {
+        "id": "설비_16",
+        "class_id": 7,
+        "class_name": "설비",
+        "class_name_en": "MEP / Utility Room",
+        "instance_index": 16,
+        "is_external_context": false,
+        "is_vertical_core": false
+      },
+      {
+        "id": "설비_17",
+        "class_id": 7,
+        "class_name": "설비",
+        "class_name_en": "MEP / Utility Room",
+        "instance_index": 17,
+        "is_external_context": false,
+        "is_vertical_core": false
+      },
+      {
+        "id": "화장실_3",
+        "class_id": 10,
+        "class_name": "화장실",
+        "class_name_en": "Restroom",
+        "instance_index": 3,
+        "is_external_context": false,
+        "is_vertical_core": false
+      },
+      {
+        "id": "계단실_2",
+        "class_id": 9,
+        "class_name": "계단실",
+        "class_name_en": "Staircase",
+        "instance_index": 2,
+        "is_external_context": false,
+        "is_vertical_core": true
+      },
+      {
+        "id": "관리실_1",
+        "class_id": 11,
+        "class_name": "관리실",
+        "class_name_en": "Management Room",
+        "instance_index": 1,
+        "is_external_context": false,
+        "is_vertical_core": false
+      },
+      {
+        "id": "E.V_2",
+        "class_id": 8,
+        "class_name": "E.V",
+        "class_name_en": "Elevator",
+        "instance_index": 2,
+        "is_external_context": false,
+        "is_vertical_core": true
+      },
+      {
+        "id": "공지_3",
+        "class_id": 16,
+        "class_name": "공지",
+        "class_name_en": "Open Space",
+        "instance_index": 3,
+        "is_external_context": true,
+        "is_vertical_core": false,
+        "face": "E",
+        "offset": 84.5,
+        "is_surrounding_mass": false
+      },
+      {
+        "id": "계단실_3",
+        "class_id": 9,
+        "class_name": "계단실",
+        "class_name_en": "Staircase",
+        "instance_index": 3,
+        "is_external_context": false,
+        "is_vertical_core": true
+      },
+      {
+        "id": "메인도로_1",
+        "class_id": 2,
+        "class_name": "메인도로",
+        "class_name_en": "Main Road",
+        "instance_index": 1,
+        "is_external_context": true,
+        "is_vertical_core": false,
+        "face": "E",
+        "offset": 111.0,
+        "is_surrounding_mass": false
+      },
+      {
+        "id": "주차장_2",
+        "class_id": 19,
+        "class_name": "주차장",
+        "class_name_en": "Parking Lot",
+        "instance_index": 2,
+        "is_external_context": false,
+        "is_vertical_core": false
+      }
+    ],
+    "edges": [
+      {
+        "source": "주변매스_1",
+        "target": "공지_1",
+        "weight": 1.0
+      },
+      {
+        "source": "공지_1",
+        "target": "주차장_1",
+        "weight": 0.1
+      },
+      {
+        "source": "주차장_1",
+        "target": "공지_4",
+        "weight": 0.1
+      },
+      {
+        "source": "주차장_1",
+        "target": "홀_1",
+        "weight": 0.1
+      },
+      {
+        "source": "부도로_1",
+        "target": "공지_4",
+        "weight": 1.0
+      },
+      {
+        "source": "공지_4",
+        "target": "설비_2",
+        "weight": 0.5
+      },
+      {
+        "source": "공지_4",
+        "target": "설비_1",
+        "weight": 0.5
+      },
+      {
+        "source": "공지_4",
+        "target": "홀_1",
+        "weight": 0.5
+      },
+      {
+        "source": "주변매스_2",
+        "target": "공지_2",
+        "weight": 1.0
+      },
+      {
+        "source": "공지_2",
+        "target": "임대_2",
+        "weight": 0.2
+      },
+      {
+        "source": "설비_16",
+        "target": "설비_17",
+        "weight": 0.0
+      },
+      {
+        "source": "설비_17",
+        "target": "화장실_3",
+        "weight": 0.0
+      },
+      {
+        "source": "화장실_3",
+        "target": "임대_2",
+        "weight": 0.5
+      },
+      {
+        "source": "화장실_3",
+        "target": "계단실_2",
+        "weight": 0.0
+      },
+      {
+        "source": "계단실_2",
+        "target": "홀_1",
+        "weight": 1.0
+      },
+      {
+        "source": "관리실_1",
+        "target": "홀_1",
+        "weight": 0.5
+      },
+      {
+        "source": "홀_1",
+        "target": "E.V_2",
+        "weight": 0.5
+      },
+      {
+        "source": "E.V_2",
+        "target": "설비_1",
+        "weight": 0.0
+      },
+      {
+        "source": "E.V_2",
+        "target": "설비_2",
+        "weight": 0.0
+      },
+      {
+        "source": "설비_1",
+        "target": "설비_2",
+        "weight": 0.0
+      },
+      {
+        "source": "임대_2",
+        "target": "공지_3",
+        "weight": 0.7
+      },
+      {
+        "source": "계단실_3",
+        "target": "공지_3",
+        "weight": 1.0
+      },
+      {
+        "source": "공지_3",
+        "target": "메인도로_1",
+        "weight": 1.0
+      },
+      {
+        "source": "공지_3",
+        "target": "주차장_2",
+        "weight": 0.1
+      }
+    ]
+  },
+  {
+    "floor_key": "building_005+2",
+    "floor_label": "2",
+    "num_nodes": 16,
+    "num_edges": 21,
+    "nodes": [
+      {
+        "id": "주변매스_1",
+        "class_id": 18,
+        "class_name": "주변매스",
+        "class_name_en": "Surrounding Mass",
+        "instance_index": 1,
+        "is_external_context": true,
+        "is_vertical_core": false,
+        "face": "S",
+        "offset": 126.0,
+        "is_surrounding_mass": true
+      },
+      {
+        "id": "공지_1",
+        "class_id": 16,
+        "class_name": "공지",
+        "class_name_en": "Open Space",
+        "instance_index": 1,
+        "is_external_context": true,
+        "is_vertical_core": false,
+        "face": "S",
+        "offset": 84.5,
+        "is_surrounding_mass": false
+      },
+      {
+        "id": "임대_3",
+        "class_id": 1,
+        "class_name": "임대",
+        "class_name_en": "Leasable Unit",
+        "instance_index": 3,
+        "is_external_context": false,
+        "is_vertical_core": false
+      },
+      {
+        "id": "화장실_4",
+        "class_id": 10,
+        "class_name": "화장실",
+        "class_name_en": "Restroom",
+        "instance_index": 4,
+        "is_external_context": false,
+        "is_vertical_core": false
+      },
+      {
+        "id": "화장실_5",
+        "class_id": 10,
+        "class_name": "화장실",
+        "class_name_en": "Restroom",
+        "instance_index": 5,
+        "is_external_context": false,
+        "is_vertical_core": false
+      },
+      {
+        "id": "복도_1",
+        "class_id": 3,
+        "class_name": "복도",
+        "class_name_en": "Corridor",
+        "instance_index": 1,
+        "is_external_context": false,
+        "is_vertical_core": false
+      },
+      {
+        "id": "계단실_4",
+        "class_id": 9,
+        "class_name": "계단실",
+        "class_name_en": "Staircase",
+        "instance_index": 4,
+        "is_external_context": false,
+        "is_vertical_core": true
+      },
+      {
+        "id": "공지_4",
+        "class_id": 16,
+        "class_name": "공지",
+        "class_name_en": "Open Space",
+        "instance_index": 4,
+        "is_external_context": true,
+        "is_vertical_core": false,
+        "face": "N",
+        "offset": 84.5,
+        "is_surrounding_mass": false
+      },
+      {
+        "id": "E.V_3",
+        "class_id": 8,
+        "class_name": "E.V",
+        "class_name_en": "Elevator",
+        "instance_index": 3,
+        "is_external_context": false,
+        "is_vertical_core": true
+      },
+      {
+        "id": "설비_3",
+        "class_id": 7,
+        "class_name": "설비",
+        "class_name_en": "MEP / Utility Room",
+        "instance_index": 3,
+        "is_external_context": false,
+        "is_vertical_core": false
+      },
+      {
+        "id": "설비_4",
+        "class_id": 7,
+        "class_name": "설비",
+        "class_name_en": "MEP / Utility Room",
+        "instance_index": 4,
+        "is_external_context": false,
+        "is_vertical_core": false
+      },
+      {
+        "id": "주변매스_2",
+        "class_id": 18,
+        "class_name": "주변매스",
+        "class_name_en": "Surrounding Mass",
+        "instance_index": 2,
+        "is_external_context": true,
+        "is_vertical_core": false,
+        "face": "W",
+        "offset": 126.0,
+        "is_surrounding_mass": true
+      },
+      {
+        "id": "공지_2",
+        "class_id": 16,
+        "class_name": "공지",
+        "class_name_en": "Open Space",
+        "instance_index": 2,
+        "is_external_context": true,
+        "is_vertical_core": false,
+        "face": "W",
+        "offset": 84.5,
+        "is_surrounding_mass": false
+      },
+      {
+        "id": "공지_3",
+        "class_id": 16,
+        "class_name": "공지",
+        "class_name_en": "Open Space",
+        "instance_index": 3,
+        "is_external_context": true,
+        "is_vertical_core": false,
+        "face": "E",
+        "offset": 84.5,
+        "is_surrounding_mass": false
+      },
+      {
+        "id": "메인도로_1",
+        "class_id": 2,
+        "class_name": "메인도로",
+        "class_name_en": "Main Road",
+        "instance_index": 1,
+        "is_external_context": true,
+        "is_vertical_core": false,
+        "face": "E",
+        "offset": 111.0,
+        "is_surrounding_mass": false
+      },
+      {
+        "id": "부도로_1",
+        "class_id": 14,
+        "class_name": "부도로",
+        "class_name_en": "Secondary Road",
+        "instance_index": 1,
+        "is_external_context": true,
+        "is_vertical_core": false,
+        "face": "N",
+        "offset": 107.0,
+        "is_surrounding_mass": false
+      }
+    ],
+    "edges": [
+      {
+        "source": "주변매스_1",
+        "target": "공지_1",
+        "weight": 1.0
+      },
+      {
+        "source": "공지_1",
+        "target": "임대_3",
+        "weight": 0.4
+      },
+      {
+        "source": "화장실_4",
+        "target": "화장실_5",
+        "weight": 0.0
+      },
+      {
+        "source": "화장실_4",
+        "target": "복도_1",
+        "weight": 0.5
+      },
+      {
+        "source": "화장실_5",
+        "target": "복도_1",
+        "weight": 0.5
+      },
+      {
+        "source": "화장실_5",
+        "target": "계단실_4",
+        "weight": 0.0
+      },
+      {
+        "source": "복도_1",
+        "target": "계단실_4",
+        "weight": 1.0
+      },
+      {
+        "source": "복도_1",
+        "target": "공지_4",
+        "weight": 0.2
+      },
+      {
+        "source": "계단실_4",
+        "target": "E.V_3",
+        "weight": 0.5
+      },
+      {
+        "source": "계단실_4",
+        "target": "임대_3",
+        "weight": 0.5
+      },
+      {
+        "source": "E.V_3",
+        "target": "설비_3",
+        "weight": 0.0
+      },
+      {
+        "source": "E.V_3",
+        "target": "설비_4",
+        "weight": 0.0
+      },
+      {
+        "source": "설비_3",
+        "target": "설비_4",
+        "weight": 0.0
+      },
+      {
+        "source": "설비_3",
+        "target": "임대_3",
+        "weight": 0.5
+      },
+      {
+        "source": "설비_4",
+        "target": "임대_3",
+        "weight": 0.5
+      },
+      {
+        "source": "주변매스_2",
+        "target": "공지_2",
+        "weight": 1.0
+      },
+      {
+        "source": "공지_2",
+        "target": "임대_3",
+        "weight": 0.4
+      },
+      {
+        "source": "임대_3",
+        "target": "공지_4",
+        "weight": 0.4
+      },
+      {
+        "source": "임대_3",
+        "target": "공지_3",
+        "weight": 0.4
+      },
+      {
+        "source": "공지_3",
+        "target": "메인도로_1",
+        "weight": 1.0
+      },
+      {
+        "source": "공지_4",
+        "target": "부도로_1",
+        "weight": 1.0
+      }
+    ]
+  },
+  {
+    "floor_key": "building_005+3",
+    "floor_label": "3",
+    "num_nodes": 19,
+    "num_edges": 27,
+    "nodes": [
+      {
+        "id": "주변매스_1",
+        "class_id": 18,
+        "class_name": "주변매스",
+        "class_name_en": "Surrounding Mass",
+        "instance_index": 1,
+        "is_external_context": true,
+        "is_vertical_core": false,
+        "face": "S",
+        "offset": 126.0,
+        "is_surrounding_mass": true
+      },
+      {
+        "id": "공지_1",
+        "class_id": 16,
+        "class_name": "공지",
+        "class_name_en": "Open Space",
+        "instance_index": 1,
+        "is_external_context": true,
+        "is_vertical_core": false,
+        "face": "S",
+        "offset": 84.5,
+        "is_surrounding_mass": false
+      },
+      {
+        "id": "창고_2",
+        "class_id": 12,
+        "class_name": "창고",
+        "class_name_en": "Storage",
+        "instance_index": 2,
+        "is_external_context": false,
+        "is_vertical_core": false
+      },
+      {
+        "id": "테라스_1",
+        "class_id": 13,
+        "class_name": "테라스",
+        "class_name_en": "Terrace",
+        "instance_index": 1,
+        "is_external_context": false,
+        "is_vertical_core": false
+      },
+      {
+        "id": "복도_3",
+        "class_id": 3,
+        "class_name": "복도",
+        "class_name_en": "Corridor",
+        "instance_index": 3,
+        "is_external_context": false,
+        "is_vertical_core": false
+      },
+      {
+        "id": "임대_4",
+        "class_id": 1,
+        "class_name": "임대",
+        "class_name_en": "Leasable Unit",
+        "instance_index": 4,
+        "is_external_context": false,
+        "is_vertical_core": false
+      },
+      {
+        "id": "계단실_5",
+        "class_id": 9,
+        "class_name": "계단실",
+        "class_name_en": "Staircase",
+        "instance_index": 5,
+        "is_external_context": false,
+        "is_vertical_core": true
+      },
+      {
+        "id": "설비_5",
+        "class_id": 7,
+        "class_name": "설비",
+        "class_name_en": "MEP / Utility Room",
+        "instance_index": 5,
+        "is_external_context": false,
+        "is_vertical_core": false
+      },
+      {
+        "id": "설비_6",
+        "class_id": 7,
+        "class_name": "설비",
+        "class_name_en": "MEP / Utility Room",
+        "instance_index": 6,
+        "is_external_context": false,
+        "is_vertical_core": false
+      },
+      {
+        "id": "공지_4",
+        "class_id": 16,
+        "class_name": "공지",
+        "class_name_en": "Open Space",
+        "instance_index": 4,
+        "is_external_context": true,
+        "is_vertical_core": false,
+        "face": "N",
+        "offset": 84.5,
+        "is_surrounding_mass": false
+      },
+      {
+        "id": "공지_3",
+        "class_id": 16,
+        "class_name": "공지",
+        "class_name_en": "Open Space",
+        "instance_index": 3,
+        "is_external_context": true,
+        "is_vertical_core": false,
+        "face": "E",
+        "offset": 84.5,
+        "is_surrounding_mass": false
+      },
+      {
+        "id": "메인도로_1",
+        "class_id": 2,
+        "class_name": "메인도로",
+        "class_name_en": "Main Road",
+        "instance_index": 1,
+        "is_external_context": true,
+        "is_vertical_core": false,
+        "face": "E",
+        "offset": 111.0,
+        "is_surrounding_mass": false
+      },
+      {
+        "id": "주변매스_2",
+        "class_id": 18,
+        "class_name": "주변매스",
+        "class_name_en": "Surrounding Mass",
+        "instance_index": 2,
+        "is_external_context": true,
+        "is_vertical_core": false,
+        "face": "W",
+        "offset": 126.0,
+        "is_surrounding_mass": true
+      },
+      {
+        "id": "공지_2",
+        "class_id": 16,
+        "class_name": "공지",
+        "class_name_en": "Open Space",
+        "instance_index": 2,
+        "is_external_context": true,
+        "is_vertical_core": false,
+        "face": "W",
+        "offset": 84.5,
+        "is_surrounding_mass": false
+      },
+      {
+        "id": "화장실_6",
+        "class_id": 10,
+        "class_name": "화장실",
+        "class_name_en": "Restroom",
+        "instance_index": 6,
+        "is_external_context": false,
+        "is_vertical_core": false
+      },
+      {
+        "id": "화장실_7",
+        "class_id": 10,
+        "class_name": "화장실",
+        "class_name_en": "Restroom",
+        "instance_index": 7,
+        "is_external_context": false,
+        "is_vertical_core": false
+      },
+      {
+        "id": "복도_2",
+        "class_id": 3,
+        "class_name": "복도",
+        "class_name_en": "Corridor",
+        "instance_index": 2,
+        "is_external_context": false,
+        "is_vertical_core": false
+      },
+      {
+        "id": "E.V_4",
+        "class_id": 8,
+        "class_name": "E.V",
+        "class_name_en": "Elevator",
+        "instance_index": 4,
+        "is_external_context": false,
+        "is_vertical_core": true
+      },
+      {
+        "id": "부도로_1",
+        "class_id": 14,
+        "class_name": "부도로",
+        "class_name_en": "Secondary Road",
+        "instance_index": 1,
+        "is_external_context": true,
+        "is_vertical_core": false,
+        "face": "N",
+        "offset": 107.0,
+        "is_surrounding_mass": false
+      }
+    ],
+    "edges": [
+      {
+        "source": "주변매스_1",
+        "target": "공지_1",
+        "weight": 1.0
+      },
+      {
+        "source": "공지_1",
+        "target": "창고_2",
+        "weight": 0.3
+      },
+      {
+        "source": "공지_1",
+        "target": "테라스_1",
+        "weight": 1.0
+      },
+      {
+        "source": "창고_2",
+        "target": "복도_3",
+        "weight": 1.0
+      },
+      {
+        "source": "창고_2",
+        "target": "테라스_1",
+        "weight": 0.3
+      },
+      {
+        "source": "복도_3",
+        "target": "임대_4",
+        "weight": 1.0
+      },
+      {
+        "source": "임대_4",
+        "target": "테라스_1",
+        "weight": 0.5
+      },
+      {
+        "source": "임대_4",
+        "target": "계단실_5",
+        "weight": 0.5
+      },
+      {
+        "source": "임대_4",
+        "target": "설비_5",
+        "weight": 0.5
+      },
+      {
+        "source": "임대_4",
+        "target": "설비_6",
+        "weight": 0.5
+      },
+      {
+        "source": "임대_4",
+        "target": "공지_4",
+        "weight": 0.4
+      },
+      {
+        "source": "임대_4",
+        "target": "공지_3",
+        "weight": 0.4
+      },
+      {
+        "source": "공지_3",
+        "target": "테라스_1",
+        "weight": 1.0
+      },
+      {
+        "source": "공지_3",
+        "target": "메인도로_1",
+        "weight": 1.0
+      },
+      {
+        "source": "주변매스_2",
+        "target": "공지_2",
+        "weight": 1.0
+      },
+      {
+        "source": "공지_2",
+        "target": "테라스_1",
+        "weight": 1.0
+      },
+      {
+        "source": "화장실_6",
+        "target": "화장실_7",
+        "weight": 0.0
+      },
+      {
+        "source": "화장실_6",
+        "target": "복도_2",
+        "weight": 0.5
+      },
+      {
+        "source": "화장실_7",
+        "target": "복도_2",
+        "weight": 0.5
+      },
+      {
+        "source": "화장실_7",
+        "target": "계단실_5",
+        "weight": 0.0
+      },
+      {
+        "source": "계단실_5",
+        "target": "복도_2",
+        "weight": 1.0
+      },
+      {
+        "source": "계단실_5",
+        "target": "E.V_4",
+        "weight": 0.5
+      },
+      {
+        "source": "복도_2",
+        "target": "공지_4",
+        "weight": 0.3
+      },
+      {
+        "source": "E.V_4",
+        "target": "설비_5",
+        "weight": 0.0
+      },
+      {
+        "source": "E.V_4",
+        "target": "설비_6",
+        "weight": 0.0
+      },
+      {
+        "source": "설비_5",
+        "target": "설비_6",
+        "weight": 0.0
+      },
+      {
+        "source": "공지_4",
+        "target": "부도로_1",
+        "weight": 1.0
+      }
+    ]
+  },
+  {
+    "floor_key": "building_005+4",
+    "floor_label": "4",
+    "num_nodes": 18,
+    "num_edges": 24,
+    "nodes": [
+      {
+        "id": "주변매스_1",
+        "class_id": 18,
+        "class_name": "주변매스",
+        "class_name_en": "Surrounding Mass",
+        "instance_index": 1,
+        "is_external_context": true,
+        "is_vertical_core": false,
+        "face": "S",
+        "offset": 126.0,
+        "is_surrounding_mass": true
+      },
+      {
+        "id": "공지_1",
+        "class_id": 16,
+        "class_name": "공지",
+        "class_name_en": "Open Space",
+        "instance_index": 1,
+        "is_external_context": true,
+        "is_vertical_core": false,
+        "face": "S",
+        "offset": 84.5,
+        "is_surrounding_mass": false
+      },
+      {
+        "id": "창고_3",
+        "class_id": 12,
+        "class_name": "창고",
+        "class_name_en": "Storage",
+        "instance_index": 3,
+        "is_external_context": false,
+        "is_vertical_core": false
+      },
+      {
+        "id": "공지_2",
+        "class_id": 16,
+        "class_name": "공지",
+        "class_name_en": "Open Space",
+        "instance_index": 2,
+        "is_external_context": true,
+        "is_vertical_core": false,
+        "face": "W",
+        "offset": 84.5,
+        "is_surrounding_mass": false
+      },
+      {
+        "id": "복도_5",
+        "class_id": 3,
+        "class_name": "복도",
+        "class_name_en": "Corridor",
+        "instance_index": 5,
+        "is_external_context": false,
+        "is_vertical_core": false
+      },
+      {
+        "id": "임대_5",
+        "class_id": 1,
+        "class_name": "임대",
+        "class_name_en": "Leasable Unit",
+        "instance_index": 5,
+        "is_external_context": false,
+        "is_vertical_core": false
+      },
+      {
+        "id": "주변매스_2",
+        "class_id": 18,
+        "class_name": "주변매스",
+        "class_name_en": "Surrounding Mass",
+        "instance_index": 2,
+        "is_external_context": true,
+        "is_vertical_core": false,
+        "face": "W",
+        "offset": 126.0,
+        "is_surrounding_mass": true
+      },
+      {
+        "id": "계단실_6",
+        "class_id": 9,
+        "class_name": "계단실",
+        "class_name_en": "Staircase",
+        "instance_index": 6,
+        "is_external_context": false,
+        "is_vertical_core": true
+      },
+      {
+        "id": "설비_7",
+        "class_id": 7,
+        "class_name": "설비",
+        "class_name_en": "MEP / Utility Room",
+        "instance_index": 7,
+        "is_external_context": false,
+        "is_vertical_core": false
+      },
+      {
+        "id": "설비_8",
+        "class_id": 7,
+        "class_name": "설비",
+        "class_name_en": "MEP / Utility Room",
+        "instance_index": 8,
+        "is_external_context": false,
+        "is_vertical_core": false
+      },
+      {
+        "id": "공지_4",
+        "class_id": 16,
+        "class_name": "공지",
+        "class_name_en": "Open Space",
+        "instance_index": 4,
+        "is_external_context": true,
+        "is_vertical_core": false,
+        "face": "N",
+        "offset": 84.5,
+        "is_surrounding_mass": false
+      },
+      {
+        "id": "공지_3",
+        "class_id": 16,
+        "class_name": "공지",
+        "class_name_en": "Open Space",
+        "instance_index": 3,
+        "is_external_context": true,
+        "is_vertical_core": false,
+        "face": "E",
+        "offset": 84.5,
+        "is_surrounding_mass": false
+      },
+      {
+        "id": "메인도로_1",
+        "class_id": 2,
+        "class_name": "메인도로",
+        "class_name_en": "Main Road",
+        "instance_index": 1,
+        "is_external_context": true,
+        "is_vertical_core": false,
+        "face": "E",
+        "offset": 111.0,
+        "is_surrounding_mass": false
+      },
+      {
+        "id": "화장실_8",
+        "class_id": 10,
+        "class_name": "화장실",
+        "class_name_en": "Restroom",
+        "instance_index": 8,
+        "is_external_context": false,
+        "is_vertical_core": false
+      },
+      {
+        "id": "화장실_9",
+        "class_id": 10,
+        "class_name": "화장실",
+        "class_name_en": "Restroom",
+        "instance_index": 9,
+        "is_external_context": false,
+        "is_vertical_core": false
+      },
+      {
+        "id": "복도_4",
+        "class_id": 3,
+        "class_name": "복도",
+        "class_name_en": "Corridor",
+        "instance_index": 4,
+        "is_external_context": false,
+        "is_vertical_core": false
+      },
+      {
+        "id": "E.V_5",
+        "class_id": 8,
+        "class_name": "E.V",
+        "class_name_en": "Elevator",
+        "instance_index": 5,
+        "is_external_context": false,
+        "is_vertical_core": true
+      },
+      {
+        "id": "부도로_1",
+        "class_id": 14,
+        "class_name": "부도로",
+        "class_name_en": "Secondary Road",
+        "instance_index": 1,
+        "is_external_context": true,
+        "is_vertical_core": false,
+        "face": "N",
+        "offset": 107.0,
+        "is_surrounding_mass": false
+      }
+    ],
+    "edges": [
+      {
+        "source": "주변매스_1",
+        "target": "공지_1",
+        "weight": 1.0
+      },
+      {
+        "source": "공지_1",
+        "target": "창고_3",
+        "weight": 0.3
+      },
+      {
+        "source": "창고_3",
+        "target": "공지_2",
+        "weight": 0.3
+      },
+      {
+        "source": "창고_3",
+        "target": "복도_5",
+        "weight": 1.0
+      },
+      {
+        "source": "복도_5",
+        "target": "임대_5",
+        "weight": 1.0
+      },
+      {
+        "source": "주변매스_2",
+        "target": "공지_2",
+        "weight": 1.0
+      },
+      {
+        "source": "공지_2",
+        "target": "임대_5",
+        "weight": 0.3
+      },
+      {
+        "source": "임대_5",
+        "target": "계단실_6",
+        "weight": 0.5
+      },
+      {
+        "source": "임대_5",
+        "target": "설비_7",
+        "weight": 0.5
+      },
+      {
+        "source": "임대_5",
+        "target": "설비_8",
+        "weight": 0.5
+      },
+      {
+        "source": "임대_5",
+        "target": "공지_4",
+        "weight": 0.4
+      },
+      {
+        "source": "임대_5",
+        "target": "공지_3",
+        "weight": 0.4
+      },
+      {
+        "source": "공지_3",
+        "target": "메인도로_1",
+        "weight": 1.0
+      },
+      {
+        "source": "화장실_8",
+        "target": "화장실_9",
+        "weight": 0.0
+      },
+      {
+        "source": "화장실_8",
+        "target": "복도_4",
+        "weight": 0.5
+      },
+      {
+        "source": "화장실_9",
+        "target": "복도_4",
+        "weight": 0.5
+      },
+      {
+        "source": "화장실_9",
+        "target": "계단실_6",
+        "weight": 0.0
+      },
+      {
+        "source": "복도_4",
+        "target": "계단실_6",
+        "weight": 1.0
+      },
+      {
+        "source": "복도_4",
+        "target": "공지_4",
+        "weight": 0.3
+      },
+      {
+        "source": "계단실_6",
+        "target": "E.V_5",
+        "weight": 0.5
+      },
+      {
+        "source": "E.V_5",
+        "target": "설비_7",
+        "weight": 0.0
+      },
+      {
+        "source": "E.V_5",
+        "target": "설비_8",
+        "weight": 0.0
+      },
+      {
+        "source": "설비_7",
+        "target": "설비_8",
+        "weight": 0.0
+      },
+      {
+        "source": "부도로_1",
+        "target": "공지_4",
+        "weight": 1.0
+      }
+    ]
+  },
+  {
+    "floor_key": "building_005+5",
+    "floor_label": "5",
+    "num_nodes": 14,
+    "num_edges": 19,
+    "nodes": [
+      {
+        "id": "주변매스_2",
+        "class_id": 18,
+        "class_name": "주변매스",
+        "class_name_en": "Surrounding Mass",
+        "instance_index": 2,
+        "is_external_context": true,
+        "is_vertical_core": false,
+        "face": "W",
+        "offset": 126.0,
+        "is_surrounding_mass": true
+      },
+      {
+        "id": "공지_2",
+        "class_id": 16,
+        "class_name": "공지",
+        "class_name_en": "Open Space",
+        "instance_index": 2,
+        "is_external_context": true,
+        "is_vertical_core": false,
+        "face": "W",
+        "offset": 84.5,
+        "is_surrounding_mass": false
+      },
+      {
+        "id": "테라스_2",
+        "class_id": 13,
+        "class_name": "테라스",
+        "class_name_en": "Terrace",
+        "instance_index": 2,
+        "is_external_context": false,
+        "is_vertical_core": false
+      },
+      {
+        "id": "공지_1",
+        "class_id": 16,
+        "class_name": "공지",
+        "class_name_en": "Open Space",
+        "instance_index": 1,
+        "is_external_context": true,
+        "is_vertical_core": false,
+        "face": "S",
+        "offset": 84.5,
+        "is_surrounding_mass": false
+      },
+      {
+        "id": "계단실_7",
+        "class_id": 9,
+        "class_name": "계단실",
+        "class_name_en": "Staircase",
+        "instance_index": 7,
+        "is_external_context": false,
+        "is_vertical_core": true
+      },
+      {
+        "id": "임대_6",
+        "class_id": 1,
+        "class_name": "임대",
+        "class_name_en": "Leasable Unit",
+        "instance_index": 6,
+        "is_external_context": false,
+        "is_vertical_core": false
+      },
+      {
+        "id": "공지_3",
+        "class_id": 16,
+        "class_name": "공지",
+        "class_name_en": "Open Space",
+        "instance_index": 3,
+        "is_external_context": true,
+        "is_vertical_core": false,
+        "face": "E",
+        "offset": 84.5,
+        "is_surrounding_mass": false
+      },
+      {
+        "id": "E.V_6",
+        "class_id": 8,
+        "class_name": "E.V",
+        "class_name_en": "Elevator",
+        "instance_index": 6,
+        "is_external_context": false,
+        "is_vertical_core": true
+      },
+      {
+        "id": "설비_9",
+        "class_id": 7,
+        "class_name": "설비",
+        "class_name_en": "MEP / Utility Room",
+        "instance_index": 9,
+        "is_external_context": false,
+        "is_vertical_core": false
+      },
+      {
+        "id": "화장실_10",
+        "class_id": 10,
+        "class_name": "화장실",
+        "class_name_en": "Restroom",
+        "instance_index": 10,
+        "is_external_context": false,
+        "is_vertical_core": false
+      },
+      {
+        "id": "공지_4",
+        "class_id": 16,
+        "class_name": "공지",
+        "class_name_en": "Open Space",
+        "instance_index": 4,
+        "is_external_context": true,
+        "is_vertical_core": false,
+        "face": "N",
+        "offset": 84.5,
+        "is_surrounding_mass": false
+      },
+      {
+        "id": "메인도로_1",
+        "class_id": 2,
+        "class_name": "메인도로",
+        "class_name_en": "Main Road",
+        "instance_index": 1,
+        "is_external_context": true,
+        "is_vertical_core": false,
+        "face": "E",
+        "offset": 111.0,
+        "is_surrounding_mass": false
+      },
+      {
+        "id": "설비_10",
+        "class_id": 7,
+        "class_name": "설비",
+        "class_name_en": "MEP / Utility Room",
+        "instance_index": 10,
+        "is_external_context": false,
+        "is_vertical_core": false
+      },
+      {
+        "id": "부도로_1",
+        "class_id": 14,
+        "class_name": "부도로",
+        "class_name_en": "Secondary Road",
+        "instance_index": 1,
+        "is_external_context": true,
+        "is_vertical_core": false,
+        "face": "N",
+        "offset": 107.0,
+        "is_surrounding_mass": false
+      }
+    ],
+    "edges": [
+      {
+        "source": "주변매스_2",
+        "target": "공지_2",
+        "weight": 1.0
+      },
+      {
+        "source": "공지_2",
+        "target": "테라스_2",
+        "weight": 1.0
+      },
+      {
+        "source": "테라스_2",
+        "target": "공지_1",
+        "weight": 1.0
+      },
+      {
+        "source": "테라스_2",
+        "target": "계단실_7",
+        "weight": 0.3
+      },
+      {
+        "source": "테라스_2",
+        "target": "임대_6",
+        "weight": 0.5
+      },
+      {
+        "source": "테라스_2",
+        "target": "공지_3",
+        "weight": 1.0
+      },
+      {
+        "source": "계단실_7",
+        "target": "임대_6",
+        "weight": 0.5
+      },
+      {
+        "source": "계단실_7",
+        "target": "E.V_6",
+        "weight": 0.5
+      },
+      {
+        "source": "임대_6",
+        "target": "설비_9",
+        "weight": 0.5
+      },
+      {
+        "source": "임대_6",
+        "target": "화장실_10",
+        "weight": 0.5
+      },
+      {
+        "source": "임대_6",
+        "target": "공지_4",
+        "weight": 0.4
+      },
+      {
+        "source": "임대_6",
+        "target": "공지_3",
+        "weight": 0.4
+      },
+      {
+        "source": "공지_3",
+        "target": "메인도로_1",
+        "weight": 1.0
+      },
+      {
+        "source": "E.V_6",
+        "target": "설비_9",
+        "weight": 0.0
+      },
+      {
+        "source": "E.V_6",
+        "target": "설비_10",
+        "weight": 0.0
+      },
+      {
+        "source": "설비_9",
+        "target": "설비_10",
+        "weight": 0.0
+      },
+      {
+        "source": "설비_10",
+        "target": "화장실_10",
+        "weight": 0.5
+      },
+      {
+        "source": "화장실_10",
+        "target": "공지_4",
+        "weight": 0.2
+      },
+      {
+        "source": "공지_4",
+        "target": "부도로_1",
+        "weight": 1.0
+      }
+    ]
+  },
+  {
+    "floor_key": "building_005+6",
+    "floor_label": "6",
+    "num_nodes": 11,
+    "num_edges": 15,
+    "nodes": [
+      {
+        "id": "공지_2",
+        "class_id": 16,
+        "class_name": "공지",
+        "class_name_en": "Open Space",
+        "instance_index": 2,
+        "is_external_context": true,
+        "is_vertical_core": false,
+        "face": "N",
+        "offset": 84.5,
+        "is_surrounding_mass": false
+      },
+      {
+        "id": "계단실_8",
+        "class_id": 9,
+        "class_name": "계단실",
+        "class_name_en": "Staircase",
+        "instance_index": 8,
+        "is_external_context": false,
+        "is_vertical_core": true
+      },
+      {
+        "id": "임대_7",
+        "class_id": 1,
+        "class_name": "임대",
+        "class_name_en": "Leasable Unit",
+        "instance_index": 7,
+        "is_external_context": false,
+        "is_vertical_core": false
+      },
+      {
+        "id": "E.V_7",
+        "class_id": 8,
+        "class_name": "E.V",
+        "class_name_en": "Elevator",
+        "instance_index": 7,
+        "is_external_context": false,
+        "is_vertical_core": true
+      },
+      {
+        "id": "설비_11",
+        "class_id": 7,
+        "class_name": "설비",
+        "class_name_en": "MEP / Utility Room",
+        "instance_index": 11,
+        "is_external_context": false,
+        "is_vertical_core": false
+      },
+      {
+        "id": "화장실_11",
+        "class_id": 10,
+        "class_name": "화장실",
+        "class_name_en": "Restroom",
+        "instance_index": 11,
+        "is_external_context": false,
+        "is_vertical_core": false
+      },
+      {
+        "id": "공지_4",
+        "class_id": 16,
+        "class_name": "공지",
+        "class_name_en": "Open Space",
+        "instance_index": 4,
+        "is_external_context": true,
+        "is_vertical_core": false,
+        "face": "N",
+        "offset": 109.5,
+        "is_surrounding_mass": false
+      },
+      {
+        "id": "공지_3",
+        "class_id": 16,
+        "class_name": "공지",
+        "class_name_en": "Open Space",
+        "instance_index": 3,
+        "is_external_context": true,
+        "is_vertical_core": false,
+        "face": "E",
+        "offset": 84.5,
+        "is_surrounding_mass": false
+      },
+      {
+        "id": "메인도로_1",
+        "class_id": 2,
+        "class_name": "메인도로",
+        "class_name_en": "Main Road",
+        "instance_index": 1,
+        "is_external_context": true,
+        "is_vertical_core": false,
+        "face": "E",
+        "offset": 111.0,
+        "is_surrounding_mass": false
+      },
+      {
+        "id": "설비_12",
+        "class_id": 7,
+        "class_name": "설비",
+        "class_name_en": "MEP / Utility Room",
+        "instance_index": 12,
+        "is_external_context": false,
+        "is_vertical_core": false
+      },
+      {
+        "id": "부도로_1",
+        "class_id": 14,
+        "class_name": "부도로",
+        "class_name_en": "Secondary Road",
+        "instance_index": 1,
+        "is_external_context": true,
+        "is_vertical_core": false,
+        "face": "N",
+        "offset": 132.0,
+        "is_surrounding_mass": false
+      }
+    ],
+    "edges": [
+      {
+        "source": "공지_2",
+        "target": "계단실_8",
+        "weight": 0.3
+      },
+      {
+        "source": "공지_2",
+        "target": "임대_7",
+        "weight": 0.3
+      },
+      {
+        "source": "계단실_8",
+        "target": "임대_7",
+        "weight": 0.5
+      },
+      {
+        "source": "계단실_8",
+        "target": "E.V_7",
+        "weight": 0.5
+      },
+      {
+        "source": "임대_7",
+        "target": "설비_11",
+        "weight": 0.5
+      },
+      {
+        "source": "임대_7",
+        "target": "화장실_11",
+        "weight": 0.5
+      },
+      {
+        "source": "임대_7",
+        "target": "공지_4",
+        "weight": 0.4
+      },
+      {
+        "source": "임대_7",
+        "target": "공지_3",
+        "weight": 0.4
+      },
+      {
+        "source": "공지_3",
+        "target": "메인도로_1",
+        "weight": 1.0
+      },
+      {
+        "source": "E.V_7",
+        "target": "설비_11",
+        "weight": 0.0
+      },
+      {
+        "source": "E.V_7",
+        "target": "설비_12",
+        "weight": 0.0
+      },
+      {
+        "source": "설비_11",
+        "target": "설비_12",
+        "weight": 0.0
+      },
+      {
+        "source": "설비_12",
+        "target": "화장실_11",
+        "weight": 0.5
+      },
+      {
+        "source": "화장실_11",
+        "target": "공지_4",
+        "weight": 0.2
+      },
+      {
+        "source": "공지_4",
+        "target": "부도로_1",
+        "weight": 1.0
+      }
+    ]
+  },
+  {
+    "floor_key": "building_005+7",
+    "floor_label": "7",
+    "num_nodes": 13,
+    "num_edges": 16,
+    "nodes": [
+      {
+        "id": "공지_2",
+        "class_id": 16,
+        "class_name": "공지",
+        "class_name_en": "Open Space",
+        "instance_index": 2,
+        "is_external_context": true,
+        "is_vertical_core": false,
+        "face": "S",
+        "offset": 84.5,
+        "is_surrounding_mass": false
+      },
+      {
+        "id": "임대_8",
+        "class_id": 1,
+        "class_name": "임대",
+        "class_name_en": "Leasable Unit",
+        "instance_index": 8,
+        "is_external_context": false,
+        "is_vertical_core": false
+      },
+      {
+        "id": "공지_1",
+        "class_id": 16,
+        "class_name": "공지",
+        "class_name_en": "Open Space",
+        "instance_index": 1,
+        "is_external_context": true,
+        "is_vertical_core": false,
+        "face": "W",
+        "offset": 84.5,
+        "is_surrounding_mass": false
+      },
+      {
+        "id": "계단실_9",
+        "class_id": 9,
+        "class_name": "계단실",
+        "class_name_en": "Staircase",
+        "instance_index": 9,
+        "is_external_context": false,
+        "is_vertical_core": true
+      },
+      {
+        "id": "E.V_8",
+        "class_id": 8,
+        "class_name": "E.V",
+        "class_name_en": "Elevator",
+        "instance_index": 8,
+        "is_external_context": false,
+        "is_vertical_core": true
+      },
+      {
+        "id": "창고_4",
+        "class_id": 12,
+        "class_name": "창고",
+        "class_name_en": "Storage",
+        "instance_index": 4,
+        "is_external_context": false,
+        "is_vertical_core": false
+      },
+      {
+        "id": "설비_14",
+        "class_id": 7,
+        "class_name": "설비",
+        "class_name_en": "MEP / Utility Room",
+        "instance_index": 14,
+        "is_external_context": false,
+        "is_vertical_core": false
+      },
+      {
+        "id": "화장실_12",
+        "class_id": 10,
+        "class_name": "화장실",
+        "class_name_en": "Restroom",
+        "instance_index": 12,
+        "is_external_context": false,
+        "is_vertical_core": false
+      },
+      {
+        "id": "공지_4",
+        "class_id": 16,
+        "class_name": "공지",
+        "class_name_en": "Open Space",
+        "instance_index": 4,
+        "is_external_context": true,
+        "is_vertical_core": false,
+        "face": "N",
+        "offset": 84.5,
+        "is_surrounding_mass": false
+      },
+      {
+        "id": "공지_3",
+        "class_id": 16,
+        "class_name": "공지",
+        "class_name_en": "Open Space",
+        "instance_index": 3,
+        "is_external_context": true,
+        "is_vertical_core": false,
+        "face": "E",
+        "offset": 84.5,
+        "is_surrounding_mass": false
+      },
+      {
+        "id": "메인도로_1",
+        "class_id": 2,
+        "class_name": "메인도로",
+        "class_name_en": "Main Road",
+        "instance_index": 1,
+        "is_external_context": true,
+        "is_vertical_core": false,
+        "face": "E",
+        "offset": 111.0,
+        "is_surrounding_mass": false
+      },
+      {
+        "id": "설비_15",
+        "class_id": 7,
+        "class_name": "설비",
+        "class_name_en": "MEP / Utility Room",
+        "instance_index": 15,
+        "is_external_context": false,
+        "is_vertical_core": false
+      },
+      {
+        "id": "부도로_1",
+        "class_id": 14,
+        "class_name": "부도로",
+        "class_name_en": "Secondary Road",
+        "instance_index": 1,
+        "is_external_context": true,
+        "is_vertical_core": false,
+        "face": "N",
+        "offset": 107.0,
+        "is_surrounding_mass": false
+      }
+    ],
+    "edges": [
+      {
+        "source": "공지_2",
+        "target": "임대_8",
+        "weight": 0.3
+      },
+      {
+        "source": "공지_1",
+        "target": "계단실_9",
+        "weight": 0.3
+      },
+      {
+        "source": "계단실_9",
+        "target": "E.V_8",
+        "weight": 0.5
+      },
+      {
+        "source": "계단실_9",
+        "target": "임대_8",
+        "weight": 0.5
+      },
+      {
+        "source": "창고_4",
+        "target": "임대_8",
+        "weight": 0.5
+      },
+      {
+        "source": "임대_8",
+        "target": "설비_14",
+        "weight": 0.5
+      },
+      {
+        "source": "임대_8",
+        "target": "화장실_12",
+        "weight": 0.5
+      },
+      {
+        "source": "임대_8",
+        "target": "공지_4",
+        "weight": 0.4
+      },
+      {
+        "source": "임대_8",
+        "target": "공지_3",
+        "weight": 0.4
+      },
+      {
+        "source": "공지_3",
+        "target": "메인도로_1",
+        "weight": 1.0
+      },
+      {
+        "source": "E.V_8",
+        "target": "설비_14",
+        "weight": 0.0
+      },
+      {
+        "source": "E.V_8",
+        "target": "설비_15",
+        "weight": 0.0
+      },
+      {
+        "source": "설비_14",
+        "target": "설비_15",
+        "weight": 0.0
+      },
+      {
+        "source": "설비_15",
+        "target": "화장실_12",
+        "weight": 0.5
+      },
+      {
+        "source": "화장실_12",
+        "target": "공지_4",
+        "weight": 0.2
+      },
+      {
+        "source": "공지_4",
+        "target": "부도로_1",
+        "weight": 1.0
+      }
+    ]
+  }
+]

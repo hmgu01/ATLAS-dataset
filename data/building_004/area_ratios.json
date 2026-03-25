@@ -1,0 +1,445 @@
+{
+  "building_id": "building_004",
+  "floors": {
+    "building_004+1": {
+      "floor_label": "1",
+      "spaces": {
+        "복도1": {
+          "area_sqm": 14.32,
+          "area_ratio": 0.1502,
+          "total_floor_area_sqm": 95.36
+        },
+        "E.V1": {
+          "area_sqm": 8.06,
+          "area_ratio": 0.0845,
+          "total_floor_area_sqm": 95.36
+        },
+        "계단실1": {
+          "area_sqm": 8.34,
+          "area_ratio": 0.0875,
+          "total_floor_area_sqm": 95.36
+        },
+        "방풍실1": {
+          "area_sqm": 5.43,
+          "area_ratio": 0.0569,
+          "total_floor_area_sqm": 95.36
+        },
+        "임대1": {
+          "area_sqm": 59.21,
+          "area_ratio": 0.6209,
+          "total_floor_area_sqm": 95.36
+        }
+      }
+    },
+    "building_004+2": {
+      "floor_label": "2",
+      "spaces": {
+        "E.V2": {
+          "area_sqm": 8.06,
+          "area_ratio": 0.0567,
+          "total_floor_area_sqm": 142.07
+        },
+        "계단실2": {
+          "area_sqm": 20.02,
+          "area_ratio": 0.1409,
+          "total_floor_area_sqm": 142.07
+        },
+        "창고1": {
+          "area_sqm": 4.51,
+          "area_ratio": 0.0317,
+          "total_floor_area_sqm": 142.07
+        },
+        "창고2": {
+          "area_sqm": 3.18,
+          "area_ratio": 0.0224,
+          "total_floor_area_sqm": 142.07
+        },
+        "화장실1": {
+          "area_sqm": 3.18,
+          "area_ratio": 0.0224,
+          "total_floor_area_sqm": 142.07
+        },
+        "화장실2": {
+          "area_sqm": 3.98,
+          "area_ratio": 0.028,
+          "total_floor_area_sqm": 142.07
+        },
+        "임대2": {
+          "area_sqm": 65.29,
+          "area_ratio": 0.4596,
+          "total_floor_area_sqm": 142.07
+        },
+        "테라스1": {
+          "area_sqm": 33.85,
+          "area_ratio": 0.2383,
+          "total_floor_area_sqm": 142.07
+        }
+      }
+    },
+    "building_004+3": {
+      "floor_label": "3",
+      "spaces": {
+        "E.V3": {
+          "area_sqm": 8.06,
+          "area_ratio": 0.0521,
+          "total_floor_area_sqm": 154.77
+        },
+        "계단실6": {
+          "area_sqm": 17.28,
+          "area_ratio": 0.1116,
+          "total_floor_area_sqm": 154.77
+        },
+        "창고3": {
+          "area_sqm": 4.51,
+          "area_ratio": 0.0291,
+          "total_floor_area_sqm": 154.77
+        },
+        "창고4": {
+          "area_sqm": 3.18,
+          "area_ratio": 0.0205,
+          "total_floor_area_sqm": 154.77
+        },
+        "화장실3": {
+          "area_sqm": 3.18,
+          "area_ratio": 0.0205,
+          "total_floor_area_sqm": 154.77
+        },
+        "화장실4": {
+          "area_sqm": 3.98,
+          "area_ratio": 0.0257,
+          "total_floor_area_sqm": 154.77
+        },
+        "임대3": {
+          "area_sqm": 114.58,
+          "area_ratio": 0.7403,
+          "total_floor_area_sqm": 154.77
+        }
+      }
+    },
+    "building_004+4": {
+      "floor_label": "4",
+      "spaces": {
+        "E.V4": {
+          "area_sqm": 8.06,
+          "area_ratio": 0.0521,
+          "total_floor_area_sqm": 154.77
+        },
+        "계단실4": {
+          "area_sqm": 17.28,
+          "area_ratio": 0.1116,
+          "total_floor_area_sqm": 154.77
+        },
+        "창고5": {
+          "area_sqm": 4.51,
+          "area_ratio": 0.0291,
+          "total_floor_area_sqm": 154.77
+        },
+        "창고6": {
+          "area_sqm": 3.18,
+          "area_ratio": 0.0205,
+          "total_floor_area_sqm": 154.77
+        },
+        "화장실5": {
+          "area_sqm": 3.18,
+          "area_ratio": 0.0205,
+          "total_floor_area_sqm": 154.77
+        },
+        "화장실6": {
+          "area_sqm": 3.98,
+          "area_ratio": 0.0257,
+          "total_floor_area_sqm": 154.77
+        },
+        "임대4": {
+          "area_sqm": 114.58,
+          "area_ratio": 0.7403,
+          "total_floor_area_sqm": 154.77
+        }
+      }
+    },
+    "building_004+5": {
+      "floor_label": "5",
+      "spaces": {
+        "E.V5": {
+          "area_sqm": 8.06,
+          "area_ratio": 0.0521,
+          "total_floor_area_sqm": 154.77
+        },
+        "계단실5": {
+          "area_sqm": 17.28,
+          "area_ratio": 0.1116,
+          "total_floor_area_sqm": 154.77
+        },
+        "창고7": {
+          "area_sqm": 4.51,
+          "area_ratio": 0.0291,
+          "total_floor_area_sqm": 154.77
+        },
+        "창고8": {
+          "area_sqm": 3.18,
+          "area_ratio": 0.0205,
+          "total_floor_area_sqm": 154.77
+        },
+        "화장실7": {
+          "area_sqm": 3.18,
+          "area_ratio": 0.0205,
+          "total_floor_area_sqm": 154.77
+        },
+        "화장실8": {
+          "area_sqm": 3.98,
+          "area_ratio": 0.0257,
+          "total_floor_area_sqm": 154.77
+        },
+        "임대5": {
+          "area_sqm": 114.58,
+          "area_ratio": 0.7403,
+          "total_floor_area_sqm": 154.77
+        }
+      }
+    },
+    "building_004+6": {
+      "floor_label": "6",
+      "spaces": {
+        "E.V6": {
+          "area_sqm": 8.06,
+          "area_ratio": 0.0521,
+          "total_floor_area_sqm": 154.77
+        },
+        "계단실6": {
+          "area_sqm": 17.28,
+          "area_ratio": 0.1116,
+          "total_floor_area_sqm": 154.77
+        },
+        "창고9": {
+          "area_sqm": 4.51,
+          "area_ratio": 0.0291,
+          "total_floor_area_sqm": 154.77
+        },
+        "창고10": {
+          "area_sqm": 3.18,
+          "area_ratio": 0.0205,
+          "total_floor_area_sqm": 154.77
+        },
+        "화장실9": {
+          "area_sqm": 3.18,
+          "area_ratio": 0.0205,
+          "total_floor_area_sqm": 154.77
+        },
+        "화장실10": {
+          "area_sqm": 3.98,
+          "area_ratio": 0.0257,
+          "total_floor_area_sqm": 154.77
+        },
+        "임대6": {
+          "area_sqm": 114.58,
+          "area_ratio": 0.7403,
+          "total_floor_area_sqm": 154.77
+        }
+      }
+    },
+    "building_004+7": {
+      "floor_label": "7",
+      "spaces": {
+        "E.V7": {
+          "area_sqm": 8.06,
+          "area_ratio": 0.0521,
+          "total_floor_area_sqm": 154.77
+        },
+        "계단실7": {
+          "area_sqm": 17.28,
+          "area_ratio": 0.1116,
+          "total_floor_area_sqm": 154.77
+        },
+        "창고11": {
+          "area_sqm": 4.51,
+          "area_ratio": 0.0291,
+          "total_floor_area_sqm": 154.77
+        },
+        "창고12": {
+          "area_sqm": 3.18,
+          "area_ratio": 0.0205,
+          "total_floor_area_sqm": 154.77
+        },
+        "화장실11": {
+          "area_sqm": 3.18,
+          "area_ratio": 0.0205,
+          "total_floor_area_sqm": 154.77
+        },
+        "화장실12": {
+          "area_sqm": 3.98,
+          "area_ratio": 0.0257,
+          "total_floor_area_sqm": 154.77
+        },
+        "임대7": {
+          "area_sqm": 114.58,
+          "area_ratio": 0.7403,
+          "total_floor_area_sqm": 154.77
+        }
+      }
+    },
+    "building_004+8": {
+      "floor_label": "8",
+      "spaces": {
+        "E.V8": {
+          "area_sqm": 8.06,
+          "area_ratio": 0.0521,
+          "total_floor_area_sqm": 154.77
+        },
+        "계단실8": {
+          "area_sqm": 17.28,
+          "area_ratio": 0.1116,
+          "total_floor_area_sqm": 154.77
+        },
+        "창고13": {
+          "area_sqm": 4.51,
+          "area_ratio": 0.0291,
+          "total_floor_area_sqm": 154.77
+        },
+        "창고14": {
+          "area_sqm": 3.18,
+          "area_ratio": 0.0205,
+          "total_floor_area_sqm": 154.77
+        },
+        "화장실13": {
+          "area_sqm": 3.18,
+          "area_ratio": 0.0205,
+          "total_floor_area_sqm": 154.77
+        },
+        "화장실14": {
+          "area_sqm": 3.98,
+          "area_ratio": 0.0257,
+          "total_floor_area_sqm": 154.77
+        },
+        "임대8": {
+          "area_sqm": 114.58,
+          "area_ratio": 0.7403,
+          "total_floor_area_sqm": 154.77
+        }
+      }
+    },
+    "building_004+9": {
+      "floor_label": "9",
+      "spaces": {
+        "E.V9": {
+          "area_sqm": 8.06,
+          "area_ratio": 0.0521,
+          "total_floor_area_sqm": 154.77
+        },
+        "계단실9": {
+          "area_sqm": 17.28,
+          "area_ratio": 0.1116,
+          "total_floor_area_sqm": 154.77
+        },
+        "창고15": {
+          "area_sqm": 4.51,
+          "area_ratio": 0.0291,
+          "total_floor_area_sqm": 154.77
+        },
+        "창고16": {
+          "area_sqm": 3.18,
+          "area_ratio": 0.0205,
+          "total_floor_area_sqm": 154.77
+        },
+        "화장실15": {
+          "area_sqm": 3.18,
+          "area_ratio": 0.0205,
+          "total_floor_area_sqm": 154.77
+        },
+        "화장실16": {
+          "area_sqm": 3.98,
+          "area_ratio": 0.0257,
+          "total_floor_area_sqm": 154.77
+        },
+        "임대9": {
+          "area_sqm": 114.58,
+          "area_ratio": 0.7403,
+          "total_floor_area_sqm": 154.77
+        }
+      }
+    },
+    "building_004+10": {
+      "floor_label": "10",
+      "spaces": {
+        "E.V10": {
+          "area_sqm": 8.06,
+          "area_ratio": 0.0521,
+          "total_floor_area_sqm": 154.77
+        },
+        "계단실10": {
+          "area_sqm": 17.28,
+          "area_ratio": 0.1116,
+          "total_floor_area_sqm": 154.77
+        },
+        "창고17": {
+          "area_sqm": 4.51,
+          "area_ratio": 0.0291,
+          "total_floor_area_sqm": 154.77
+        },
+        "창고18": {
+          "area_sqm": 3.18,
+          "area_ratio": 0.0205,
+          "total_floor_area_sqm": 154.77
+        },
+        "화장실17": {
+          "area_sqm": 3.18,
+          "area_ratio": 0.0205,
+          "total_floor_area_sqm": 154.77
+        },
+        "화장실18": {
+          "area_sqm": 3.98,
+          "area_ratio": 0.0257,
+          "total_floor_area_sqm": 154.77
+        },
+        "임대10": {
+          "area_sqm": 114.58,
+          "area_ratio": 0.7403,
+          "total_floor_area_sqm": 154.77
+        }
+      }
+    },
+    "building_004+11": {
+      "floor_label": "11",
+      "spaces": {
+        "E.V11": {
+          "area_sqm": 8.06,
+          "area_ratio": 0.0524,
+          "total_floor_area_sqm": 153.87
+        },
+        "계단실11": {
+          "area_sqm": 17.28,
+          "area_ratio": 0.1123,
+          "total_floor_area_sqm": 153.87
+        },
+        "복도2": {
+          "area_sqm": 3.58,
+          "area_ratio": 0.0233,
+          "total_floor_area_sqm": 153.87
+        },
+        "복도3": {
+          "area_sqm": 10.1,
+          "area_ratio": 0.0656,
+          "total_floor_area_sqm": 153.87
+        },
+        "화장실19": {
+          "area_sqm": 4.02,
+          "area_ratio": 0.0261,
+          "total_floor_area_sqm": 153.87
+        },
+        "임대11": {
+          "area_sqm": 34.44,
+          "area_ratio": 0.2238,
+          "total_floor_area_sqm": 153.87
+        },
+        "테라스2": {
+          "area_sqm": 37.24,
+          "area_ratio": 0.242,
+          "total_floor_area_sqm": 153.87
+        },
+        "테라스3": {
+          "area_sqm": 39.15,
+          "area_ratio": 0.2544,
+          "total_floor_area_sqm": 153.87
+        }
+      }
+    }
+  }
+}

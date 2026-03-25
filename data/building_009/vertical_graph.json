@@ -1,0 +1,2059 @@
+{
+  "building_id": "building_009",
+  "total_inter_floor_edges": 228,
+  "mandatory_continuity_edges": 154,
+  "edges": [
+    {
+      "source_floor": "B2",
+      "source_node": "홀_10",
+      "source_class_id": 6,
+      "target_node": "홀_1",
+      "target_class_id": 6,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "B2",
+      "source_node": "설비_18",
+      "source_class_id": 7,
+      "target_node": "설비_1",
+      "target_class_id": 7,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "B2",
+      "source_node": "설비_19",
+      "source_class_id": 7,
+      "target_node": "설비_2",
+      "target_class_id": 7,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "B2",
+      "source_node": "E.V_19",
+      "source_class_id": 8,
+      "target_node": "E.V_1",
+      "target_class_id": 8,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "B2",
+      "source_node": "E.V_20",
+      "source_class_id": 8,
+      "target_node": "E.V_2",
+      "target_class_id": 8,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "B2",
+      "source_node": "계단실_18",
+      "source_class_id": 9,
+      "target_node": "계단실_1",
+      "target_class_id": 9,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "B2",
+      "source_node": "계단실_19",
+      "source_class_id": 9,
+      "target_node": "계단실_2",
+      "target_class_id": 9,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "B2",
+      "source_node": "기계실_2",
+      "source_class_id": 20,
+      "target_node": "기계실_1",
+      "target_class_id": 20,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "B2",
+      "source_node": "물탱크실_2",
+      "source_class_id": 5,
+      "target_node": "물탱크실_1",
+      "target_class_id": 5,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "B2",
+      "source_node": "방재실_2",
+      "source_class_id": 21,
+      "target_node": "방재실_1",
+      "target_class_id": 21,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "B2",
+      "source_node": "전기실_2",
+      "source_class_id": 22,
+      "target_node": "전기실_1",
+      "target_class_id": 22,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "B1",
+      "source_node": "홀_1",
+      "source_class_id": 6,
+      "target_node": "홀_10",
+      "target_class_id": 6,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "B1",
+      "source_node": "설비_1",
+      "source_class_id": 7,
+      "target_node": "설비_18",
+      "target_class_id": 7,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "B1",
+      "source_node": "설비_2",
+      "source_class_id": 7,
+      "target_node": "설비_19",
+      "target_class_id": 7,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "B1",
+      "source_node": "E.V_1",
+      "source_class_id": 8,
+      "target_node": "E.V_19",
+      "target_class_id": 8,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "B1",
+      "source_node": "E.V_2",
+      "source_class_id": 8,
+      "target_node": "E.V_20",
+      "target_class_id": 8,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "B1",
+      "source_node": "계단실_1",
+      "source_class_id": 9,
+      "target_node": "계단실_18",
+      "target_class_id": 9,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "B1",
+      "source_node": "계단실_2",
+      "source_class_id": 9,
+      "target_node": "계단실_19",
+      "target_class_id": 9,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "B1",
+      "source_node": "홀_1",
+      "source_class_id": 6,
+      "target_node": "홀_2",
+      "target_class_id": 6,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "B1",
+      "source_node": "설비_1",
+      "source_class_id": 7,
+      "target_node": "설비_3",
+      "target_class_id": 7,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "B1",
+      "source_node": "설비_2",
+      "source_class_id": 7,
+      "target_node": "설비_4",
+      "target_class_id": 7,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "B1",
+      "source_node": "E.V_1",
+      "source_class_id": 8,
+      "target_node": "E.V_3",
+      "target_class_id": 8,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "B1",
+      "source_node": "E.V_2",
+      "source_class_id": 8,
+      "target_node": "E.V_4",
+      "target_class_id": 8,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "B1",
+      "source_node": "계단실_1",
+      "source_class_id": 9,
+      "target_node": "계단실_3",
+      "target_class_id": 9,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "B1",
+      "source_node": "계단실_2",
+      "source_class_id": 9,
+      "target_node": "계단실_4",
+      "target_class_id": 9,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "B1",
+      "source_node": "기계실_1",
+      "source_class_id": 20,
+      "target_node": "기계실_2",
+      "target_class_id": 20,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "B1",
+      "source_node": "물탱크실_1",
+      "source_class_id": 5,
+      "target_node": "물탱크실_2",
+      "target_class_id": 5,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "B1",
+      "source_node": "방재실_1",
+      "source_class_id": 21,
+      "target_node": "방재실_2",
+      "target_class_id": 21,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "B1",
+      "source_node": "전기실_1",
+      "source_class_id": 22,
+      "target_node": "전기실_2",
+      "target_class_id": 22,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "1",
+      "source_node": "홀_2",
+      "source_class_id": 6,
+      "target_node": "홀_1",
+      "target_class_id": 6,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "1",
+      "source_node": "설비_3",
+      "source_class_id": 7,
+      "target_node": "설비_1",
+      "target_class_id": 7,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "1",
+      "source_node": "설비_4",
+      "source_class_id": 7,
+      "target_node": "설비_2",
+      "target_class_id": 7,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "1",
+      "source_node": "E.V_3",
+      "source_class_id": 8,
+      "target_node": "E.V_1",
+      "target_class_id": 8,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "1",
+      "source_node": "E.V_4",
+      "source_class_id": 8,
+      "target_node": "E.V_2",
+      "target_class_id": 8,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "1",
+      "source_node": "계단실_3",
+      "source_class_id": 9,
+      "target_node": "계단실_1",
+      "target_class_id": 9,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "1",
+      "source_node": "계단실_4",
+      "source_class_id": 9,
+      "target_node": "계단실_2",
+      "target_class_id": 9,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "1",
+      "source_node": "홀_2",
+      "source_class_id": 6,
+      "target_node": "홀_3",
+      "target_class_id": 6,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "1",
+      "source_node": "설비_3",
+      "source_class_id": 7,
+      "target_node": "설비_5",
+      "target_class_id": 7,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "1",
+      "source_node": "설비_4",
+      "source_class_id": 7,
+      "target_node": "설비_6",
+      "target_class_id": 7,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "1",
+      "source_node": "E.V_3",
+      "source_class_id": 8,
+      "target_node": "E.V_5",
+      "target_class_id": 8,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "1",
+      "source_node": "E.V_4",
+      "source_class_id": 8,
+      "target_node": "E.V_6",
+      "target_class_id": 8,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "1",
+      "source_node": "계단실_3",
+      "source_class_id": 9,
+      "target_node": "계단실_5",
+      "target_class_id": 9,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "1",
+      "source_node": "계단실_4",
+      "source_class_id": 9,
+      "target_node": "계단실_6",
+      "target_class_id": 9,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "1",
+      "source_node": "임대_1",
+      "source_class_id": 1,
+      "target_node": "임대_7",
+      "target_class_id": 1,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "1",
+      "source_node": "임대_2",
+      "source_class_id": 1,
+      "target_node": "임대_7",
+      "target_class_id": 1,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "1",
+      "source_node": "임대_3",
+      "source_class_id": 1,
+      "target_node": "임대_8",
+      "target_class_id": 1,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "1",
+      "source_node": "임대_4",
+      "source_class_id": 1,
+      "target_node": "임대_9",
+      "target_class_id": 1,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "1",
+      "source_node": "임대_5",
+      "source_class_id": 1,
+      "target_node": "임대_10",
+      "target_class_id": 1,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "1",
+      "source_node": "임대_6",
+      "source_class_id": 1,
+      "target_node": "임대_11",
+      "target_class_id": 1,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "1",
+      "source_node": "복도_1",
+      "source_class_id": 3,
+      "target_node": "복도_2",
+      "target_class_id": 5,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "1",
+      "source_node": "화장실_1",
+      "source_class_id": 10,
+      "target_node": "화장실_3",
+      "target_class_id": 10,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "1",
+      "source_node": "화장실_2",
+      "source_class_id": 10,
+      "target_node": "화장실_4",
+      "target_class_id": 10,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "2",
+      "source_node": "홀_3",
+      "source_class_id": 6,
+      "target_node": "홀_2",
+      "target_class_id": 6,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "2",
+      "source_node": "설비_5",
+      "source_class_id": 7,
+      "target_node": "설비_3",
+      "target_class_id": 7,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "2",
+      "source_node": "설비_6",
+      "source_class_id": 7,
+      "target_node": "설비_4",
+      "target_class_id": 7,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "2",
+      "source_node": "E.V_5",
+      "source_class_id": 8,
+      "target_node": "E.V_3",
+      "target_class_id": 8,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "2",
+      "source_node": "E.V_6",
+      "source_class_id": 8,
+      "target_node": "E.V_4",
+      "target_class_id": 8,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "2",
+      "source_node": "계단실_5",
+      "source_class_id": 9,
+      "target_node": "계단실_3",
+      "target_class_id": 9,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "2",
+      "source_node": "계단실_6",
+      "source_class_id": 9,
+      "target_node": "계단실_4",
+      "target_class_id": 9,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "2",
+      "source_node": "홀_3",
+      "source_class_id": 6,
+      "target_node": "홀_4",
+      "target_class_id": 6,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "2",
+      "source_node": "설비_5",
+      "source_class_id": 7,
+      "target_node": "설비_7",
+      "target_class_id": 7,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "2",
+      "source_node": "설비_6",
+      "source_class_id": 7,
+      "target_node": "설비_8",
+      "target_class_id": 7,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "2",
+      "source_node": "E.V_5",
+      "source_class_id": 8,
+      "target_node": "E.V_7",
+      "target_class_id": 8,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "2",
+      "source_node": "E.V_6",
+      "source_class_id": 8,
+      "target_node": "E.V_8",
+      "target_class_id": 8,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "2",
+      "source_node": "계단실_5",
+      "source_class_id": 9,
+      "target_node": "계단실_7",
+      "target_class_id": 9,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "2",
+      "source_node": "계단실_6",
+      "source_class_id": 9,
+      "target_node": "계단실_8",
+      "target_class_id": 9,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "2",
+      "source_node": "임대_7",
+      "source_class_id": 1,
+      "target_node": "임대_12",
+      "target_class_id": 1,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "2",
+      "source_node": "임대_8",
+      "source_class_id": 1,
+      "target_node": "임대_13",
+      "target_class_id": 1,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "2",
+      "source_node": "임대_9",
+      "source_class_id": 1,
+      "target_node": "임대_14",
+      "target_class_id": 1,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "2",
+      "source_node": "임대_10",
+      "source_class_id": 1,
+      "target_node": "임대_15",
+      "target_class_id": 1,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "2",
+      "source_node": "임대_11",
+      "source_class_id": 1,
+      "target_node": "임대_16",
+      "target_class_id": 1,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "2",
+      "source_node": "임대_7",
+      "source_class_id": 1,
+      "target_node": "임대_1",
+      "target_class_id": 1,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "2",
+      "source_node": "임대_7",
+      "source_class_id": 1,
+      "target_node": "임대_2",
+      "target_class_id": 1,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "2",
+      "source_node": "임대_8",
+      "source_class_id": 1,
+      "target_node": "임대_3",
+      "target_class_id": 1,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "2",
+      "source_node": "임대_9",
+      "source_class_id": 1,
+      "target_node": "임대_4",
+      "target_class_id": 1,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "2",
+      "source_node": "임대_10",
+      "source_class_id": 1,
+      "target_node": "임대_5",
+      "target_class_id": 1,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "2",
+      "source_node": "임대_11",
+      "source_class_id": 1,
+      "target_node": "임대_6",
+      "target_class_id": 1,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "2",
+      "source_node": "복도_2",
+      "source_class_id": 3,
+      "target_node": "복도_1",
+      "target_class_id": 3,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "2",
+      "source_node": "복도_2",
+      "source_class_id": 5,
+      "target_node": "복도_3",
+      "target_class_id": 3,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "2",
+      "source_node": "화장실_3",
+      "source_class_id": 10,
+      "target_node": "화장실_1",
+      "target_class_id": 10,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "2",
+      "source_node": "화장실_3",
+      "source_class_id": 10,
+      "target_node": "화장실_5",
+      "target_class_id": 10,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "2",
+      "source_node": "화장실_4",
+      "source_class_id": 10,
+      "target_node": "화장실_2",
+      "target_class_id": 10,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "2",
+      "source_node": "화장실_4",
+      "source_class_id": 10,
+      "target_node": "화장실_6",
+      "target_class_id": 10,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "3",
+      "source_node": "홀_4",
+      "source_class_id": 6,
+      "target_node": "홀_3",
+      "target_class_id": 6,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "3",
+      "source_node": "설비_7",
+      "source_class_id": 7,
+      "target_node": "설비_5",
+      "target_class_id": 7,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "3",
+      "source_node": "설비_8",
+      "source_class_id": 7,
+      "target_node": "설비_6",
+      "target_class_id": 7,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "3",
+      "source_node": "E.V_7",
+      "source_class_id": 8,
+      "target_node": "E.V_5",
+      "target_class_id": 8,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "3",
+      "source_node": "E.V_8",
+      "source_class_id": 8,
+      "target_node": "E.V_6",
+      "target_class_id": 8,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "3",
+      "source_node": "계단실_7",
+      "source_class_id": 9,
+      "target_node": "계단실_5",
+      "target_class_id": 9,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "3",
+      "source_node": "계단실_8",
+      "source_class_id": 9,
+      "target_node": "계단실_6",
+      "target_class_id": 9,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "3",
+      "source_node": "홀_4",
+      "source_class_id": 6,
+      "target_node": "홀_5",
+      "target_class_id": 6,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "3",
+      "source_node": "설비_7",
+      "source_class_id": 7,
+      "target_node": "설비_9",
+      "target_class_id": 7,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "3",
+      "source_node": "설비_8",
+      "source_class_id": 7,
+      "target_node": "설비_10",
+      "target_class_id": 7,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "3",
+      "source_node": "E.V_7",
+      "source_class_id": 8,
+      "target_node": "E.V_9",
+      "target_class_id": 8,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "3",
+      "source_node": "E.V_8",
+      "source_class_id": 8,
+      "target_node": "E.V_10",
+      "target_class_id": 8,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "3",
+      "source_node": "계단실_7",
+      "source_class_id": 9,
+      "target_node": "계단실_9",
+      "target_class_id": 9,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "3",
+      "source_node": "계단실_8",
+      "source_class_id": 9,
+      "target_node": "계단실_10",
+      "target_class_id": 9,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "3",
+      "source_node": "임대_12",
+      "source_class_id": 1,
+      "target_node": "임대_17",
+      "target_class_id": 1,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "3",
+      "source_node": "임대_13",
+      "source_class_id": 1,
+      "target_node": "임대_18",
+      "target_class_id": 1,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "3",
+      "source_node": "임대_14",
+      "source_class_id": 1,
+      "target_node": "임대_19",
+      "target_class_id": 1,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "3",
+      "source_node": "임대_15",
+      "source_class_id": 1,
+      "target_node": "임대_20",
+      "target_class_id": 1,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "3",
+      "source_node": "임대_16",
+      "source_class_id": 1,
+      "target_node": "임대_21",
+      "target_class_id": 1,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "3",
+      "source_node": "임대_12",
+      "source_class_id": 1,
+      "target_node": "임대_7",
+      "target_class_id": 1,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "3",
+      "source_node": "임대_13",
+      "source_class_id": 1,
+      "target_node": "임대_8",
+      "target_class_id": 1,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "3",
+      "source_node": "임대_14",
+      "source_class_id": 1,
+      "target_node": "임대_9",
+      "target_class_id": 1,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "3",
+      "source_node": "임대_15",
+      "source_class_id": 1,
+      "target_node": "임대_10",
+      "target_class_id": 1,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "3",
+      "source_node": "임대_16",
+      "source_class_id": 1,
+      "target_node": "임대_11",
+      "target_class_id": 1,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "3",
+      "source_node": "복도_3",
+      "source_class_id": 3,
+      "target_node": "복도_2",
+      "target_class_id": 3,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "3",
+      "source_node": "복도_3",
+      "source_class_id": 5,
+      "target_node": "복도_4",
+      "target_class_id": 3,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "3",
+      "source_node": "화장실_5",
+      "source_class_id": 10,
+      "target_node": "화장실_3",
+      "target_class_id": 10,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "3",
+      "source_node": "화장실_5",
+      "source_class_id": 10,
+      "target_node": "화장실_7",
+      "target_class_id": 10,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "3",
+      "source_node": "화장실_6",
+      "source_class_id": 10,
+      "target_node": "화장실_4",
+      "target_class_id": 10,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "3",
+      "source_node": "화장실_6",
+      "source_class_id": 10,
+      "target_node": "화장실_8",
+      "target_class_id": 10,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "4",
+      "source_node": "홀_5",
+      "source_class_id": 6,
+      "target_node": "홀_4",
+      "target_class_id": 6,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "4",
+      "source_node": "설비_9",
+      "source_class_id": 7,
+      "target_node": "설비_7",
+      "target_class_id": 7,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "4",
+      "source_node": "설비_10",
+      "source_class_id": 7,
+      "target_node": "설비_8",
+      "target_class_id": 7,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "4",
+      "source_node": "E.V_9",
+      "source_class_id": 8,
+      "target_node": "E.V_7",
+      "target_class_id": 8,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "4",
+      "source_node": "E.V_10",
+      "source_class_id": 8,
+      "target_node": "E.V_8",
+      "target_class_id": 8,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "4",
+      "source_node": "계단실_9",
+      "source_class_id": 9,
+      "target_node": "계단실_7",
+      "target_class_id": 9,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "4",
+      "source_node": "계단실_10",
+      "source_class_id": 9,
+      "target_node": "계단실_8",
+      "target_class_id": 9,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "4",
+      "source_node": "홀_5",
+      "source_class_id": 6,
+      "target_node": "홀_6",
+      "target_class_id": 6,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "4",
+      "source_node": "설비_9",
+      "source_class_id": 7,
+      "target_node": "설비_11",
+      "target_class_id": 7,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "4",
+      "source_node": "설비_10",
+      "source_class_id": 7,
+      "target_node": "설비_12",
+      "target_class_id": 7,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "4",
+      "source_node": "E.V_9",
+      "source_class_id": 8,
+      "target_node": "E.V_11",
+      "target_class_id": 8,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "4",
+      "source_node": "E.V_10",
+      "source_class_id": 8,
+      "target_node": "E.V_12",
+      "target_class_id": 8,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "4",
+      "source_node": "계단실_9",
+      "source_class_id": 9,
+      "target_node": "계단실_11",
+      "target_class_id": 9,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "4",
+      "source_node": "계단실_10",
+      "source_class_id": 9,
+      "target_node": "계단실_12",
+      "target_class_id": 9,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "4",
+      "source_node": "임대_17",
+      "source_class_id": 1,
+      "target_node": "임대_22",
+      "target_class_id": 1,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "4",
+      "source_node": "임대_18",
+      "source_class_id": 1,
+      "target_node": "임대_23",
+      "target_class_id": 1,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "4",
+      "source_node": "임대_19",
+      "source_class_id": 1,
+      "target_node": "임대_24",
+      "target_class_id": 1,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "4",
+      "source_node": "임대_20",
+      "source_class_id": 1,
+      "target_node": "임대_25",
+      "target_class_id": 1,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "4",
+      "source_node": "임대_21",
+      "source_class_id": 1,
+      "target_node": "임대_26",
+      "target_class_id": 1,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "4",
+      "source_node": "임대_17",
+      "source_class_id": 1,
+      "target_node": "임대_12",
+      "target_class_id": 1,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "4",
+      "source_node": "임대_18",
+      "source_class_id": 1,
+      "target_node": "임대_13",
+      "target_class_id": 1,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "4",
+      "source_node": "임대_19",
+      "source_class_id": 1,
+      "target_node": "임대_14",
+      "target_class_id": 1,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "4",
+      "source_node": "임대_20",
+      "source_class_id": 1,
+      "target_node": "임대_15",
+      "target_class_id": 1,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "4",
+      "source_node": "임대_21",
+      "source_class_id": 1,
+      "target_node": "임대_16",
+      "target_class_id": 1,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "4",
+      "source_node": "복도_4",
+      "source_class_id": 3,
+      "target_node": "복도_3",
+      "target_class_id": 3,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "4",
+      "source_node": "복도_4",
+      "source_class_id": 3,
+      "target_node": "복도_5",
+      "target_class_id": 3,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "4",
+      "source_node": "화장실_7",
+      "source_class_id": 10,
+      "target_node": "화장실_5",
+      "target_class_id": 10,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "4",
+      "source_node": "화장실_7",
+      "source_class_id": 10,
+      "target_node": "화장실_9",
+      "target_class_id": 10,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "4",
+      "source_node": "화장실_8",
+      "source_class_id": 10,
+      "target_node": "화장실_6",
+      "target_class_id": 10,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "4",
+      "source_node": "화장실_8",
+      "source_class_id": 10,
+      "target_node": "화장실_10",
+      "target_class_id": 10,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "5",
+      "source_node": "홀_6",
+      "source_class_id": 6,
+      "target_node": "홀_5",
+      "target_class_id": 6,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "5",
+      "source_node": "설비_11",
+      "source_class_id": 7,
+      "target_node": "설비_9",
+      "target_class_id": 7,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "5",
+      "source_node": "설비_12",
+      "source_class_id": 7,
+      "target_node": "설비_10",
+      "target_class_id": 7,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "5",
+      "source_node": "E.V_11",
+      "source_class_id": 8,
+      "target_node": "E.V_9",
+      "target_class_id": 8,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "5",
+      "source_node": "E.V_12",
+      "source_class_id": 8,
+      "target_node": "E.V_10",
+      "target_class_id": 8,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "5",
+      "source_node": "계단실_11",
+      "source_class_id": 9,
+      "target_node": "계단실_9",
+      "target_class_id": 9,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "5",
+      "source_node": "계단실_12",
+      "source_class_id": 9,
+      "target_node": "계단실_10",
+      "target_class_id": 9,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "5",
+      "source_node": "홀_6",
+      "source_class_id": 6,
+      "target_node": "홀_7",
+      "target_class_id": 6,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "5",
+      "source_node": "설비_11",
+      "source_class_id": 7,
+      "target_node": "설비_13",
+      "target_class_id": 7,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "5",
+      "source_node": "설비_12",
+      "source_class_id": 7,
+      "target_node": "설비_14",
+      "target_class_id": 7,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "5",
+      "source_node": "E.V_11",
+      "source_class_id": 8,
+      "target_node": "E.V_13",
+      "target_class_id": 8,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "5",
+      "source_node": "E.V_12",
+      "source_class_id": 8,
+      "target_node": "E.V_14",
+      "target_class_id": 8,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "5",
+      "source_node": "계단실_11",
+      "source_class_id": 9,
+      "target_node": "계단실_13",
+      "target_class_id": 9,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "5",
+      "source_node": "계단실_12",
+      "source_class_id": 9,
+      "target_node": "계단실_14",
+      "target_class_id": 9,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "5",
+      "source_node": "임대_22",
+      "source_class_id": 1,
+      "target_node": "임대_27",
+      "target_class_id": 1,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "5",
+      "source_node": "임대_23",
+      "source_class_id": 1,
+      "target_node": "임대_28",
+      "target_class_id": 1,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "5",
+      "source_node": "임대_24",
+      "source_class_id": 1,
+      "target_node": "임대_29",
+      "target_class_id": 1,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "5",
+      "source_node": "임대_25",
+      "source_class_id": 1,
+      "target_node": "임대_30",
+      "target_class_id": 1,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "5",
+      "source_node": "임대_26",
+      "source_class_id": 1,
+      "target_node": "임대_31",
+      "target_class_id": 1,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "5",
+      "source_node": "임대_22",
+      "source_class_id": 1,
+      "target_node": "임대_17",
+      "target_class_id": 1,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "5",
+      "source_node": "임대_23",
+      "source_class_id": 1,
+      "target_node": "임대_18",
+      "target_class_id": 1,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "5",
+      "source_node": "임대_24",
+      "source_class_id": 1,
+      "target_node": "임대_19",
+      "target_class_id": 1,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "5",
+      "source_node": "임대_25",
+      "source_class_id": 1,
+      "target_node": "임대_20",
+      "target_class_id": 1,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "5",
+      "source_node": "임대_26",
+      "source_class_id": 1,
+      "target_node": "임대_21",
+      "target_class_id": 1,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "5",
+      "source_node": "복도_5",
+      "source_class_id": 3,
+      "target_node": "복도_4",
+      "target_class_id": 3,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "5",
+      "source_node": "복도_5",
+      "source_class_id": 3,
+      "target_node": "복도_6",
+      "target_class_id": 3,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "5",
+      "source_node": "화장실_9",
+      "source_class_id": 10,
+      "target_node": "화장실_7",
+      "target_class_id": 10,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "5",
+      "source_node": "화장실_9",
+      "source_class_id": 10,
+      "target_node": "화장실_11",
+      "target_class_id": 10,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "5",
+      "source_node": "화장실_10",
+      "source_class_id": 10,
+      "target_node": "화장실_8",
+      "target_class_id": 10,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "5",
+      "source_node": "화장실_10",
+      "source_class_id": 10,
+      "target_node": "화장실_12",
+      "target_class_id": 10,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "6",
+      "source_node": "홀_7",
+      "source_class_id": 6,
+      "target_node": "홀_6",
+      "target_class_id": 6,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "6",
+      "source_node": "설비_13",
+      "source_class_id": 7,
+      "target_node": "설비_11",
+      "target_class_id": 7,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "6",
+      "source_node": "설비_14",
+      "source_class_id": 7,
+      "target_node": "설비_12",
+      "target_class_id": 7,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "6",
+      "source_node": "E.V_13",
+      "source_class_id": 8,
+      "target_node": "E.V_11",
+      "target_class_id": 8,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "6",
+      "source_node": "E.V_14",
+      "source_class_id": 8,
+      "target_node": "E.V_12",
+      "target_class_id": 8,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "6",
+      "source_node": "계단실_13",
+      "source_class_id": 9,
+      "target_node": "계단실_11",
+      "target_class_id": 9,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "6",
+      "source_node": "계단실_14",
+      "source_class_id": 9,
+      "target_node": "계단실_12",
+      "target_class_id": 9,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "6",
+      "source_node": "홀_7",
+      "source_class_id": 6,
+      "target_node": "홀_8",
+      "target_class_id": 6,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "6",
+      "source_node": "설비_13",
+      "source_class_id": 7,
+      "target_node": "설비_15",
+      "target_class_id": 7,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "6",
+      "source_node": "설비_14",
+      "source_class_id": 7,
+      "target_node": "설비_16",
+      "target_class_id": 7,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "6",
+      "source_node": "E.V_13",
+      "source_class_id": 8,
+      "target_node": "E.V_15",
+      "target_class_id": 8,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "6",
+      "source_node": "E.V_14",
+      "source_class_id": 8,
+      "target_node": "E.V_16",
+      "target_class_id": 8,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "6",
+      "source_node": "계단실_13",
+      "source_class_id": 9,
+      "target_node": "계단실_15",
+      "target_class_id": 9,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "6",
+      "source_node": "계단실_14",
+      "source_class_id": 9,
+      "target_node": "계단실_16",
+      "target_class_id": 9,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "6",
+      "source_node": "임대_27",
+      "source_class_id": 1,
+      "target_node": "임대_32",
+      "target_class_id": 1,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "6",
+      "source_node": "임대_28",
+      "source_class_id": 1,
+      "target_node": "임대_33",
+      "target_class_id": 1,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "6",
+      "source_node": "임대_29",
+      "source_class_id": 1,
+      "target_node": "임대_34",
+      "target_class_id": 1,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "6",
+      "source_node": "임대_30",
+      "source_class_id": 1,
+      "target_node": "임대_35",
+      "target_class_id": 1,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "6",
+      "source_node": "임대_31",
+      "source_class_id": 1,
+      "target_node": "임대_36",
+      "target_class_id": 1,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "6",
+      "source_node": "임대_27",
+      "source_class_id": 1,
+      "target_node": "임대_22",
+      "target_class_id": 1,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "6",
+      "source_node": "임대_28",
+      "source_class_id": 1,
+      "target_node": "임대_23",
+      "target_class_id": 1,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "6",
+      "source_node": "임대_29",
+      "source_class_id": 1,
+      "target_node": "임대_24",
+      "target_class_id": 1,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "6",
+      "source_node": "임대_30",
+      "source_class_id": 1,
+      "target_node": "임대_25",
+      "target_class_id": 1,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "6",
+      "source_node": "임대_31",
+      "source_class_id": 1,
+      "target_node": "임대_26",
+      "target_class_id": 1,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "6",
+      "source_node": "복도_6",
+      "source_class_id": 3,
+      "target_node": "복도_5",
+      "target_class_id": 3,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "6",
+      "source_node": "복도_6",
+      "source_class_id": 3,
+      "target_node": "복도_7",
+      "target_class_id": 3,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "6",
+      "source_node": "화장실_11",
+      "source_class_id": 10,
+      "target_node": "화장실_9",
+      "target_class_id": 10,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "6",
+      "source_node": "화장실_11",
+      "source_class_id": 10,
+      "target_node": "화장실_13",
+      "target_class_id": 10,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "6",
+      "source_node": "화장실_12",
+      "source_class_id": 10,
+      "target_node": "화장실_10",
+      "target_class_id": 10,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "6",
+      "source_node": "화장실_12",
+      "source_class_id": 10,
+      "target_node": "화장실_14",
+      "target_class_id": 10,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "7",
+      "source_node": "홀_8",
+      "source_class_id": 6,
+      "target_node": "홀_7",
+      "target_class_id": 6,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "7",
+      "source_node": "설비_15",
+      "source_class_id": 7,
+      "target_node": "설비_13",
+      "target_class_id": 7,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "7",
+      "source_node": "설비_16",
+      "source_class_id": 7,
+      "target_node": "설비_14",
+      "target_class_id": 7,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "7",
+      "source_node": "E.V_15",
+      "source_class_id": 8,
+      "target_node": "E.V_13",
+      "target_class_id": 8,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "7",
+      "source_node": "E.V_16",
+      "source_class_id": 8,
+      "target_node": "E.V_14",
+      "target_class_id": 8,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "7",
+      "source_node": "계단실_15",
+      "source_class_id": 9,
+      "target_node": "계단실_13",
+      "target_class_id": 9,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "7",
+      "source_node": "계단실_16",
+      "source_class_id": 9,
+      "target_node": "계단실_14",
+      "target_class_id": 9,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "7",
+      "source_node": "홀_8",
+      "source_class_id": 6,
+      "target_node": "홀_9",
+      "target_class_id": 6,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "7",
+      "source_node": "설비_16",
+      "source_class_id": 7,
+      "target_node": "설비_17",
+      "target_class_id": 7,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "7",
+      "source_node": "E.V_15",
+      "source_class_id": 8,
+      "target_node": "E.V_17",
+      "target_class_id": 8,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "7",
+      "source_node": "E.V_16",
+      "source_class_id": 8,
+      "target_node": "E.V_18",
+      "target_class_id": 8,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "7",
+      "source_node": "계단실_16",
+      "source_class_id": 9,
+      "target_node": "계단실_17",
+      "target_class_id": 9,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "7",
+      "source_node": "임대_32",
+      "source_class_id": 1,
+      "target_node": "임대_27",
+      "target_class_id": 1,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "7",
+      "source_node": "임대_33",
+      "source_class_id": 1,
+      "target_node": "임대_28",
+      "target_class_id": 1,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "7",
+      "source_node": "임대_34",
+      "source_class_id": 1,
+      "target_node": "임대_29",
+      "target_class_id": 1,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "7",
+      "source_node": "임대_35",
+      "source_class_id": 1,
+      "target_node": "임대_30",
+      "target_class_id": 1,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "7",
+      "source_node": "임대_36",
+      "source_class_id": 1,
+      "target_node": "임대_31",
+      "target_class_id": 1,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "7",
+      "source_node": "복도_7",
+      "source_class_id": 3,
+      "target_node": "복도_6",
+      "target_class_id": 3,
+      "weight": 0.0,
+      "is_mandatory_continuity": false
+    },
+    {
+      "source_floor": "7",
+      "source_node": "화장실_13",
+      "source_class_id": 10,
+      "target_node": "화장실_11",
+      "target_class_id": 10,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "7",
+      "source_node": "화장실_14",
+      "source_class_id": 10,
+      "target_node": "화장실_12",
+      "target_class_id": 10,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "8",
+      "source_node": "홀_9",
+      "source_class_id": 6,
+      "target_node": "홀_8",
+      "target_class_id": 6,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "8",
+      "source_node": "설비_17",
+      "source_class_id": 7,
+      "target_node": "설비_16",
+      "target_class_id": 7,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "8",
+      "source_node": "E.V_17",
+      "source_class_id": 8,
+      "target_node": "E.V_15",
+      "target_class_id": 8,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "8",
+      "source_node": "E.V_18",
+      "source_class_id": 8,
+      "target_node": "E.V_16",
+      "target_class_id": 8,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    },
+    {
+      "source_floor": "8",
+      "source_node": "계단실_17",
+      "source_class_id": 9,
+      "target_node": "계단실_16",
+      "target_class_id": 9,
+      "weight": 1.0,
+      "is_mandatory_continuity": true
+    }
+  ]
+}
