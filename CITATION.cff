@@ -10,7 +10,7 @@ authors:
     given-names: Seungyeon
     affiliation: "Dept. of Architecture, Kyungpook National University"
 repository-code: "https://github.com/hmgu01/ATLAS-dataset"
-doi: "[YOUR_DOI]"
+doi: "10.5281/zenodo.19225225"
 version: "1.0.0"
 date-released: "2025-03-25"
 license: CC-BY-NC-4.0
