@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ATLAS — building_010 — Spatial Relationship Graph</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#F7F8FA;color:#222;font-size:13px}
+.header{background:#1a1a2e;color:#fff;padding:14px 24px;display:flex;align-items:center;gap:16px}
+.header h1{font-size:16px;font-weight:700;letter-spacing:.3px}
+.header .meta{font-size:11px;opacity:.65;margin-left:auto;line-height:1.7}
+.tabs{display:flex;gap:0;background:#fff;border-bottom:2px solid #e8eaf0;padding:0 20px}
+.tab{padding:10px 20px;cursor:pointer;font-size:13px;font-weight:500;color:#666;border-bottom:2.5px solid transparent;margin-bottom:-2px;transition:all .15s}
+.tab.active{color:#1a7fe8;border-color:#1a7fe8}
+.tab:hover{color:#333}
+.panel{display:none;padding:20px}
+.panel.active{display:block}
+
+/* Overview */
+.ov-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+@media(max-width:700px){.ov-grid{grid-template-columns:1fr}}
+.card{background:#fff;border-radius:10px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.card h3{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:#888;margin-bottom:10px}
+.floor-table{width:100%;border-collapse:collapse;font-size:12px}
+.floor-table th{background:#f4f5f8;text-align:left;padding:6px 8px;color:#555;font-weight:600;font-size:11px}
+.floor-table td{padding:5px 8px;border-bottom:1px solid #f0f0f0}
+.floor-table tr:last-child td{border:none}
+.bar-wrap{display:flex;align-items:center;gap:6px}
+.bar{height:10px;border-radius:3px;min-width:2px}
+.cls-legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.cls-item{display:flex;align-items:center;gap:4px;font-size:11px}
+.cls-dot{width:10px;height:10px;border-radius:50%}
+
+/* 2D */
+#d2-controls{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;align-items:center}
+.ftab{font-size:11px;padding:3px 10px;border-radius:9px;border:1px solid #ddd;background:#fff;color:#555;cursor:pointer;transition:all .12s}
+.ftab.active{background:#1a7fe8;color:#fff;border-color:transparent;font-weight:600}
+.fbtn{font-size:10px;padding:2px 8px;border-radius:7px;border:1.5px solid transparent;background:#f0f1f5;color:#555;cursor:pointer}
+.fbtn.on{border-color:currentColor;font-weight:600}
+#d2-stat{font-size:11px;color:#666;padding:4px 10px;background:#f4f5f8;border-radius:6px;margin-bottom:6px}
+#d2-svg{width:100%;height:500px;border-radius:10px;background:#fff;border:1px solid #e8eaf0}
+#d2-info{font-size:12px;color:#555;padding:4px 10px;background:#f4f5f8;border-radius:6px;margin-top:5px;min-height:22px}
+
+/* 3D */
+#d3-controls{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:6px;align-items:center}
+.cbtn{font-size:11px;padding:3px 8px;border-radius:9px;border:1px solid #ddd;background:#fff;color:#555;cursor:pointer}
+.cbtn.on{background:#1a7fe8;color:#fff;border-color:transparent}
+.cbtn.paper{background:#5544AA;color:#fff;border-color:transparent;font-weight:bold}
+#fi-row{display:flex;gap:3px;flex-wrap:wrap;margin-bottom:5px;align-items:center;font-size:10px;color:#888}
+.fib{font-size:10px;padding:2px 7px;border-radius:7px;border:1px solid #ddd;background:#f4f5f8;color:#666;cursor:pointer}
+.fib.active{background:#FF7700;color:#fff;border-color:transparent}
+#d3-canvas{width:100%;height:560px;border-radius:10px;cursor:grab;display:block}
+#d3-canvas.pan{cursor:move}
+#d3-info{font-size:12px;color:#555;padding:4px 10px;background:#f4f5f8;border-radius:6px;margin-top:5px;min-height:22px}
+.hint{font-size:10px;color:#aaa;margin-left:4px}
+.sep{width:1px;height:16px;background:#e0e0e0;margin:0 2px}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+</head>
+<body>
+<div class="header">
+  <div>
+    <div style="font-size:10px;opacity:.5;letter-spacing:1px;text-transform:uppercase;margin-bottom:2px">ATLAS Dataset Viewer</div>
+    <h1>building_010 — Spatial Relationship Graph</h1>
+  </div>
+  <div class="meta">
+    9 floors &nbsp;·&nbsp; 125 nodes &nbsp;·&nbsp; 181 h-edges &nbsp;·&nbsp; 86 v-edges
+  </div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('overview',this)">📊 Overview</div>
+  <div class="tab" onclick="switchTab('d2',this)">🔵 2D Graph</div>
+  <div class="tab" onclick="switchTab('d3',this)">📐 3D View</div>
+</div>
+
+<!-- ── Overview ─────────────────────────────────────────── -->
+<div id="tab-overview" class="panel active">
+  <div class="ov-grid">
+    <div class="card">
+      <h3>Floor Summary</h3>
+      <table class="floor-table">
+        <thead><tr><th>Floor</th><th>Area(㎡)</th><th>Int.Nodes</th><th>Edges</th><th>Strong(w=1)</th></tr></thead>
+        <tbody id="floor-tbody"></tbody>
+      </table>
+    </div>
+    <div class="card">
+      <h3>Space Class Distribution</h3>
+      <div id="cls-bars"></div>
+      <div class="cls-legend" id="cls-legend"></div>
+    </div>
+  </div>
+  <div class="card">
+    <h3>Vertical Core Continuity</h3>
+    <div id="vert-info" style="font-size:12px;color:#555;line-height:1.8"></div>
+  </div>
+</div>
+
+<!-- ── 2D Graph ──────────────────────────────────────────── -->
+<div id="tab-d2" class="panel">
+  <div id="d2-controls">
+    <div id="d2-tabs" style="display:flex;gap:3px;flex-wrap:wrap"></div>
+    <div class="sep"></div>
+    <span style="font-size:10px;color:#aaa">Filter:</span>
+    <button class="fbtn on" style="color:#3A8DDD" id="f-leasable" onclick="tF('leasable')">Leasable</button>
+    <button class="fbtn on" style="color:#EE2222" id="f-core"     onclick="tF('core')">Core</button>
+    <button class="fbtn on" style="color:#BB3388" id="f-mep"      onclick="tF('mep')">WC/MEP</button>
+    <button class="fbtn on" style="color:#DD6622" id="f-circ"     onclick="tF('circ')">Circ.</button>
+    <button class="fbtn on" style="color:#8B7014" id="f-terrace"  onclick="tF('terrace')">Terrace</button>
+    <button class="fbtn on" style="color:#9966AA" id="f-storage"  onclick="tF('storage')">Storage</button>
+    <button class="fbtn on" style="color:#1D9E75" id="f-ext"      onclick="tF('ext')">Open Sp.</button>
+    <button class="fbtn on" style="color:#888780" id="f-mass"     onclick="tF('mass')">Road/Mass</button>
+    <button class="fbtn" style="color:#666;margin-left:4px" onclick="rF()">All</button>
+  </div>
+  <div id="d2-stat">—</div>
+  <svg id="d2-svg"></svg>
+  <div id="d2-info">Click node for details · Orange dashed ring = vertical continuity · N/S/E/W compass layout</div>
+</div>
+
+<!-- ── 3D View ──────────────────────────────────────────── -->
+<div id="tab-d3" class="panel">
+  <div id="d3-controls">
+    <button class="cbtn on" id="b-ext"  onclick="tog3('ext')">External</button>
+    <button class="cbtn on" id="b-cor"  onclick="tog3('cor')">Core</button>
+    <button class="cbtn on" id="b-slab" onclick="tog3('slab')">Slabs</button>
+    <button class="cbtn on" id="b-he"   onclick="tog3('he')">H-edges</button>
+    <button class="cbtn on" id="b-ve"   onclick="tog3('ve')">V-edges</button>
+    <button class="cbtn on" id="b-ce"   onclick="tog3('ce')">Ctx.edges</button>
+    <button class="cbtn on" id="b-lbl"  onclick="tog3('lbl')">Labels</button>
+    <div class="sep"></div>
+    <button class="cbtn paper" onclick="setPV()">📐 Paper View</button>
+    <button class="cbtn" onclick="rst3()">Reset</button>
+    <span class="hint">Drag:rotate · Alt+drag:pan · Scroll:zoom · Click:info</span>
+  </div>
+  <div id="fi-row">
+    <span>Floor isolate:</span>
+    <button class="fib active" id="fi-all" onclick="iso3('all')">All</button>
+  </div>
+  <canvas id="d3-canvas"></canvas>
+  <div id="d3-info">Click node for details · 📐 locks to paper figure angle</div>
+</div>
+
+<script>
+// ── Embedded data ──────────────────────────────────────────────
+const METADATA   = {"building_id":"building_010","source_file":"[ANONYMIZED]","num_floors":9,"floor_labels":["B1","1","2","3","4","5","6","7","8"],"total_nodes":125,"total_horizontal_edges":181,"total_vertical_edges":86,"node_classes_present":[1,2,5,6,7,8,9,10,13,16,18,19,23],"has_basement":true,"schema_version":"1.0"};
+const FLOORS     = [{"l":"B1","raw":"B1","n":[{"i":"물탱크실_1","c":5,"e":"Water Tank Room","n":1,"cr":0,"ext":0,"x":8.1,"z":7.4,"ar":0.5682,"asm":49.2},{"i":"계단실_1","c":9,"e":"Staircase","n":1,"cr":1,"ext":0,"x":-20.4,"z":20.4,"ar":0.0878,"asm":7.6},{"i":"물탱크실_2","c":5,"e":"Water Tank Room","n":2,"cr":0,"ext":0,"x":34.1,"z":-61.2,"ar":0.1461,"asm":12.7},{"i":"PIT_1","c":23,"e":"Pit","n":1,"cr":0,"ext":0,"x":39.1,"z":61.2,"ar":0.0432,"asm":3.7},{"i":"PIT_2","c":23,"e":"Pit","n":2,"cr":0,"ext":0,"x":61.2,"z":-34.8,"ar":0.0853,"asm":7.4},{"i":"E.V_1","c":8,"e":"Elevator","n":1,"cr":1,"ext":0,"x":-25.5,"z":13.6,"ar":0.0695,"asm":6.0}],"e":[["물탱크실_1","계단실_1",0.5],["물탱크실_1","물탱크실_2",0.0],["물탱크실_1","PIT_1",0.0],["물탱크실_1","PIT_2",0.0],["물탱크실_1","E.V_1",1.0],["물탱크실_2","PIT_2",0.0]],"area":86.7},{"l":"1","raw":"1","n":[{"i":"E.V_2","c":8,"e":"Elevator","n":2,"cr":1,"ext":0,"x":-25.5,"z":13.6,"ar":0.1284,"asm":4.9},{"i":"설비_5","c":7,"e":"MEP","n":5,"cr":0,"ext":0,"x":1.7,"z":44.2,"ar":0.016,"asm":0.6},{"i":"설비_6","c":7,"e":"MEP","n":6,"cr":0,"ext":0,"x":-43.3,"z":8.5,"ar":0.0183,"asm":0.7},{"i":"홀_1","c":6,"e":"Hall","n":1,"cr":0,"ext":0,"x":1.1,"z":-11.0,"ar":0.5423,"asm":20.7},{"i":"주변매스_1","c":18,"e":"Surrounding Mass","n":1,"cr":0,"ext":1,"face":"S","off":126.0,"viewOnly":0,"mass":1},{"i":"공지_1","c":16,"e":"Open Space","n":1,"cr":0,"ext":1,"face":"S","off":84.5,"viewOnly":0},{"i":"공지_3","c":16,"e":"Open Space","n":3,"cr":0,"ext":1,"face":"W","off":84.5,"viewOnly":0},{"i":"주변매스_2","c":18,"e":"Surrounding Mass","n":2,"cr":0,"ext":1,"face":"W","off":126.0,"viewOnly":0,"mass":1},{"i":"주변매스_3","c":18,"e":"Surrounding Mass","n":3,"cr":0,"ext":1,"face":"N","off":126.0,"viewOnly":0,"mass":1},{"i":"공지_2","c":16,"e":"Open Space","n":2,"cr":0,"ext":1,"face":"N","off":84.5,"viewOnly":0},{"i":"메인도로_1","c":2,"e":"Main Road","n":1,"cr":0,"ext":1,"face":"E","off":111.0,"viewOnly":0},{"i":"공지_4","c":16,"e":"Open Space","n":4,"cr":0,"ext":1,"face":"E","off":84.5,"viewOnly":0},{"i":"계단실_2","c":9,"e":"Staircase","n":2,"cr":1,"ext":0,"x":-20.4,"z":20.4,"ar":0.121,"asm":4.6},{"i":"주차장_2","c":19,"e":"Parking Lot","n":2,"cr":0,"ext":0,"x":34.9,"z":-61.2,"ar":0.02,"asm":0},{"i":"주차장_1","c":19,"e":"Parking Lot","n":1,"cr":0,"ext":0,"x":-13.6,"z":-61.2,"ar":0.02,"asm":0},{"i":"계단실_3","c":9,"e":"Staircase","n":3,"cr":1,"ext":0,"x":20.4,"z":20.4,"ar":0.174,"asm":6.6}],"e":[["E.V_2","설비_5",0.0],["E.V_2","설비_6",0.0],["E.V_2","홀_1",0.5],["주변매스_1","공지_1",1.0],["공지_3","홀_1",0.4],["공지_3","주변매스_2",1.0],["주변매스_3","공지_2",1.0],["메인도로_1","공지_4",1.0],["공지_1","홀_1",0.5],["공지_1","계단실_2",1.0],["공지_2","주차장_2",0.1],["계단실_2","공지_4",1.0],["계단실_2","주차장_1",0.1],["공지_4","주차장_1",0.1],["공지_4","주차장_2",0.1],["주차장_1","홀_1",0.1],["주차장_1","주차장_2",0.1],["주차장_2","홀_1",0.1],["홀_1","설비_6",0.5],["홀_1","계단실_3",1.0],["설비_5","설비_6",0.5]],"area":38.2},{"l":"2","raw":"2","n":[{"i":"공지_1","c":16,"e":"Open Space","n":1,"cr":0,"ext":1,"face":"S","off":84.5,"viewOnly":0},{"i":"계단실_4","c":9,"e":"Staircase","n":4,"cr":1,"ext":0,"x":-20.4,"z":20.4,"ar":0.0974,"asm":6.6},{"i":"테라스_1","c":13,"e":"Terrace","n":1,"cr":0,"ext":0,"x":16.5,"z":37.6,"ar":0.0401,"asm":2.7},{"i":"주변매스_1","c":18,"e":"Surrounding Mass","n":1,"cr":0,"ext":1,"face":"S","off":126.0,"viewOnly":0,"mass":1},{"i":"공지_3","c":16,"e":"Open Space","n":3,"cr":0,"ext":1,"face":"W","off":84.5,"viewOnly":0},{"i":"계단실_5","c":9,"e":"Staircase","n":5,"cr":1,"ext":0,"x":20.4,"z":20.4,"ar":0.22,"asm":14.9},{"i":"주변매스_2","c":18,"e":"Surrounding Mass","n":2,"cr":0,"ext":1,"face":"W","off":126.0,"viewOnly":0,"mass":1},{"i":"공지_2","c":16,"e":"Open Space","n":2,"cr":0,"ext":1,"face":"N","off":84.5,"viewOnly":0},{"i":"임대_1","c":1,"e":"Leasable Unit","n":1,"cr":0,"ext":0,"x":0.0,"z":0.0,"ar":0.4662,"asm":31.5},{"i":"계단실_6","c":9,"e":"Staircase","n":6,"cr":1,"ext":0,"x":-20.4,"z":-20.4,"ar":0.0845,"asm":5.7},{"i":"주변매스_3","c":18,"e":"Surrounding Mass","n":3,"cr":0,"ext":1,"face":"N","off":126.0,"viewOnly":0,"mass":1},{"i":"E.V_3","c":8,"e":"Elevator","n":3,"cr":1,"ext":0,"x":-25.5,"z":13.6,"ar":0.0725,"asm":4.9},{"i":"설비_7","c":7,"e":"MEP","n":7,"cr":0,"ext":0,"x":1.7,"z":44.2,"ar":0.009,"asm":0.6},{"i":"설비_8","c":7,"e":"MEP","n":8,"cr":0,"ext":0,"x":-43.3,"z":8.5,"ar":0.0104,"asm":0.7},{"i":"공지_4","c":16,"e":"Open Space","n":4,"cr":0,"ext":1,"face":"E","off":84.5,"viewOnly":0},{"i":"메인도로_1","c":2,"e":"Main Road","n":1,"cr":0,"ext":1,"face":"E","off":111.0,"viewOnly":0}],"e":[["공지_1","계단실_4",1.0],["공지_1","테라스_1",1.0],["공지_1","주변매스_1",1.0],["공지_3","계단실_5",0.3],["공지_3","주변매스_2",1.0],["공지_2","임대_1",0.4],["공지_2","계단실_6",0.4],["공지_2","주변매스_3",1.0],["E.V_3","설비_7",0.0],["E.V_3","설비_8",0.0],["E.V_3","계단실_5",0.5],["설비_7","계단실_4",0.0],["설비_7","설비_8",0.5],["설비_8","계단실_4",0.5],["설비_8","계단실_5",0.0],["계단실_4","테라스_1",1.0],["계단실_4","임대_1",0.5],["계단실_5","임대_1",0.5],["계단실_6","임대_1",1.0],["계단실_6","공지_4",0.4],["임대_1","테라스_1",0.5],["임대_1","공지_4",0.4],["테라스_1","공지_4",1.0],["메인도로_1","공지_4",1.0]],"area":67.6},{"l":"3","raw":"3","n":[{"i":"공지_1","c":16,"e":"Open Space","n":1,"cr":0,"ext":1,"face":"S","off":84.5,"viewOnly":1},{"i":"화장실_1","c":10,"e":"Restroom","n":1,"cr":0,"ext":0,"x":38.2,"z":9.4,"ar":0.0476,"asm":3.4},{"i":"임대_2","c":1,"e":"Leasable Unit","n":2,"cr":0,"ext":0,"x":0.0,"z":0.0,"ar":0.5221,"asm":37.6},{"i":"주변매스_1","c":18,"e":"Surrounding Mass","n":1,"cr":0,"ext":1,"face":"S","off":126.0,"viewOnly":1,"mass":1},{"i":"공지_2","c":16,"e":"Open Space","n":2,"cr":0,"ext":1,"face":"N","off":84.5,"viewOnly":1},{"i":"테라스_2","c":13,"e":"Terrace","n":2,"cr":0,"ext":0,"x":20.2,"z":-32.4,"ar":0.0278,"asm":2.0},{"i":"계단실_8","c":9,"e":"Staircase","n":8,"cr":1,"ext":0,"x":-20.4,"z":-20.4,"ar":0.1097,"asm":7.9},{"i":"주변매스_3","c":18,"e":"Surrounding Mass","n":3,"cr":0,"ext":1,"face":"N","off":126.0,"viewOnly":1,"mass":1},{"i":"공지_3","c":16,"e":"Open Space","n":3,"cr":0,"ext":1,"face":"W","off":84.5,"viewOnly":1},{"i":"주변매스_2","c":18,"e":"Surrounding Mass","n":2,"cr":0,"ext":1,"face":"W","off":126.0,"viewOnly":1,"mass":1},{"i":"계단실_7","c":9,"e":"Staircase","n":7,"cr":1,"ext":0,"x":20.4,"z":20.4,"ar":0.2065,"asm":14.9},{"i":"E.V_4","c":8,"e":"Elevator","n":4,"cr":1,"ext":0,"x":-25.5,"z":13.6,"ar":0.0681,"asm":4.9},{"i":"설비_9","c":7,"e":"MEP","n":9,"cr":0,"ext":0,"x":1.7,"z":44.2,"ar":0.0085,"asm":0.6},{"i":"설비_10","c":7,"e":"MEP","n":10,"cr":0,"ext":0,"x":-43.3,"z":8.5,"ar":0.0097,"asm":0.7},{"i":"임대_1","c":1,"e":"Leasable Unit","n":1,"cr":0,"ext":0,"x":0.0,"z":0.0,"ar":0.02,"asm":0},{"i":"공지_4","c":16,"e":"Open Space","n":4,"cr":0,"ext":1,"face":"E","off":84.5,"viewOnly":1},{"i":"메인도로_1","c":2,"e":"Main Road","n":1,"cr":0,"ext":1,"face":"E","off":111.0,"viewOnly":1}],"e":[["공지_1","화장실_1",0.2],["공지_1","임대_2",0.2],["공지_1","주변매스_1",1.0],["공지_2","테라스_2",1.0],["공지_2","계단실_8",0.3],["공지_2","주변매스_3",1.0],["공지_3","주변매스_2",1.0],["공지_3","계단실_7",0.4],["E.V_4","설비_9",0.0],["E.V_4","설비_10",0.0],["E.V_4","계단실_7",0.5],["설비_9","화장실_1",0.5],["설비_9","설비_10",0.0],["설비_10","화장실_1",0.5],["설비_10","계단실_7",0.0],["화장실_1","임대_1",0.5],["계단실_7","임대_2",0.5],["계단실_7","테라스_2",0.4],["테라스_2","임대_2",0.5],["테라스_2","계단실_8",0.4],["임대_2","공지_4",0.3],["임대_2","계단실_8",1.0],["임대_2","화장실_1",0.5],["계단실_8","공지_4",0.3],["공지_4","메인도로_1",1.0]],"area":72.0},{"l":"4","raw":"4","n":[{"i":"주변매스_1","c":18,"e":"Surrounding Mass","n":1,"cr":0,"ext":1,"face":"S","off":126.0,"viewOnly":1,"mass":1},{"i":"공지_1","c":16,"e":"Open Space","n":1,"cr":0,"ext":1,"face":"S","off":84.5,"viewOnly":1},{"i":"화장실_2","c":10,"e":"Restroom","n":2,"cr":0,"ext":0,"x":38.2,"z":9.4,"ar":0.0481,"asm":3.4},{"i":"임대_3","c":1,"e":"Leasable Unit","n":3,"cr":0,"ext":0,"x":0.0,"z":0.0,"ar":0.5202,"asm":37.1},{"i":"테라스_4","c":13,"e":"Terrace","n":4,"cr":0,"ext":0,"x":-16.6,"z":-50.8,"ar":0.108,"asm":7.7},{"i":"E.V_5","c":8,"e":"Elevator","n":5,"cr":1,"ext":0,"x":-25.5,"z":13.6,"ar":0.0687,"asm":4.9},{"i":"설비_11","c":7,"e":"MEP","n":11,"cr":0,"ext":0,"x":1.7,"z":44.2,"ar":0.0086,"asm":0.6},{"i":"설비_12","c":7,"e":"MEP","n":12,"cr":0,"ext":0,"x":-43.3,"z":8.5,"ar":0.0098,"asm":0.7},{"i":"계단실_9","c":9,"e":"Staircase","n":9,"cr":1,"ext":0,"x":20.4,"z":20.4,"ar":0.2086,"asm":14.9},{"i":"공지_2","c":16,"e":"Open Space","n":2,"cr":0,"ext":1,"face":"N","off":84.5,"viewOnly":1},{"i":"테라스_3","c":13,"e":"Terrace","n":3,"cr":0,"ext":0,"x":37.6,"z":-22.0,"ar":0.0281,"asm":2.0},{"i":"공지_4","c":16,"e":"Open Space","n":4,"cr":0,"ext":1,"face":"E","off":84.5,"viewOnly":1},{"i":"메인도로_1","c":2,"e":"Main Road","n":1,"cr":0,"ext":1,"face":"E","off":111.0,"viewOnly":1},{"i":"주변매스_2","c":18,"e":"Surrounding Mass","n":2,"cr":0,"ext":1,"face":"W","off":126.0,"viewOnly":1,"mass":1},{"i":"공지_3","c":16,"e":"Open Space","n":3,"cr":0,"ext":1,"face":"W","off":84.5,"viewOnly":1},{"i":"주변매스_3","c":18,"e":"Surrounding Mass","n":3,"cr":0,"ext":1,"face":"N","off":126.0,"viewOnly":1,"mass":1}],"e":[["주변매스_1","공지_1",1.0],["공지_1","화장실_2",0.2],["공지_1","임대_3",0.4],["공지_1","테라스_4",1.0],["E.V_5","설비_11",0.0],["E.V_5","설비_12",0.0],["E.V_5","계단실_9",0.5],["설비_11","화장실_2",0.5],["설비_11","설비_12",0.0],["설비_12","화장실_2",0.5],["설비_12","계단실_9",0.0],["화장실_2","임대_3",0.5],["임대_3","테라스_4",0.5],["임대_3","공지_2",0.4],["임대_3","테라스_3",0.5],["임대_3","계단실_9",0.5],["테라스_4","공지_4",1.0],["테라스_4","공지_2",1.0],["공지_4","메인도로_1",1.0],["주변매스_2","공지_3",1.0],["공지_3","계단실_9",0.4],["계단실_9","테라스_3",0.4],["테라스_3","공지_2",1.0],["공지_2","주변매스_3",1.0]],"area":71.3},{"l":"5","raw":"5","n":[{"i":"주변매스_1","c":18,"e":"Surrounding Mass","n":1,"cr":0,"ext":1,"face":"S","off":126.0,"viewOnly":1,"mass":1},{"i":"공지_1","c":16,"e":"Open Space","n":1,"cr":0,"ext":1,"face":"S","off":84.5,"viewOnly":1},{"i":"화장실_3","c":10,"e":"Restroom","n":3,"cr":0,"ext":0,"x":38.2,"z":9.4,"ar":0.0511,"asm":3.4},{"i":"임대_4","c":1,"e":"Leasable Unit","n":4,"cr":0,"ext":0,"x":0.0,"z":0.0,"ar":0.5523,"asm":37.1},{"i":"E.V_6","c":8,"e":"Elevator","n":6,"cr":1,"ext":0,"x":-25.5,"z":13.6,"ar":0.073,"asm":4.9},{"i":"설비_13","c":7,"e":"MEP","n":13,"cr":0,"ext":0,"x":1.7,"z":44.2,"ar":0.0091,"asm":0.6},{"i":"설비_14","c":7,"e":"MEP","n":14,"cr":0,"ext":0,"x":-43.3,"z":8.5,"ar":0.0104,"asm":0.7},{"i":"계단실_10","c":9,"e":"Staircase","n":10,"cr":1,"ext":0,"x":20.4,"z":20.4,"ar":0.2214,"asm":14.9},{"i":"테라스_6","c":13,"e":"Terrace","n":6,"cr":0,"ext":0,"x":-18.3,"z":-55.5,"ar":0.053,"asm":3.6},{"i":"공지_2","c":16,"e":"Open Space","n":2,"cr":0,"ext":1,"face":"N","off":84.5,"viewOnly":1},{"i":"테라스_5","c":13,"e":"Terrace","n":5,"cr":0,"ext":0,"x":37.0,"z":-22.2,"ar":0.0298,"asm":2.0},{"i":"공지_4","c":16,"e":"Open Space","n":4,"cr":0,"ext":1,"face":"E","off":84.5,"viewOnly":1},{"i":"메인도로_1","c":2,"e":"Main Road","n":1,"cr":0,"ext":1,"face":"E","off":111.0,"viewOnly":1},{"i":"공지_3","c":16,"e":"Open Space","n":3,"cr":0,"ext":1,"face":"W","off":84.5,"viewOnly":1}],"e":[["주변매스_1","공지_1",1.0],["공지_1","화장실_3",0.2],["공지_1","임대_4",0.4],["E.V_6","설비_13",0.0],["E.V_6","설비_14",0.0],["E.V_6","계단실_10",0.5],["설비_13","설비_14",0.0],["설비_13","화장실_3",0.5],["설비_14","계단실_10",0.0],["설비_14","화장실_3",0.5],["화장실_3","임대_4",0.5],["임대_4","테라스_6",0.4],["임대_4","공지_2",0.4],["임대_4","테라스_5",0.5],["임대_4","계단실_10",0.5],["임대_4","공지_4",0.4],["테라스_6","메인도로_1",1.0],["테라스_6","공지_2",1.0],["공지_4","테라스_6",1.0],["공지_4","메인도로_1",1.0],["공지_3","계단실_10",0.4],["계단실_10","테라스_5",0.4],["테라스_5","공지_2",1.0]],"area":67.2},{"l":"6","raw":"6","n":[{"i":"주변매스_14","c":18,"e":"Surrounding Mass","n":14,"cr":0,"ext":1,"face":"N","off":151.0,"viewOnly":1,"mass":1},{"i":"공지_11","c":16,"e":"Open Space","n":11,"cr":0,"ext":1,"face":"N","off":109.5,"viewOnly":1},{"i":"공지_1","c":16,"e":"Open Space","n":1,"cr":0,"ext":1,"face":"S","off":84.5,"viewOnly":1},{"i":"화장실_4","c":10,"e":"Restroom","n":4,"cr":0,"ext":0,"x":38.2,"z":9.4,"ar":0.0476,"asm":3.4},{"i":"임대_5","c":1,"e":"Leasable Unit","n":5,"cr":0,"ext":0,"x":0.0,"z":0.0,"ar":0.5747,"asm":41.4},{"i":"E.V_7","c":8,"e":"Elevator","n":7,"cr":1,"ext":0,"x":-25.5,"z":13.6,"ar":0.0681,"asm":4.9},{"i":"설비_15","c":7,"e":"MEP","n":15,"cr":0,"ext":0,"x":1.7,"z":44.2,"ar":0.0085,"asm":0.6},{"i":"설비_16","c":7,"e":"MEP","n":16,"cr":0,"ext":0,"x":-43.3,"z":8.5,"ar":0.0097,"asm":0.7},{"i":"계단실_11","c":9,"e":"Staircase","n":11,"cr":1,"ext":0,"x":20.4,"z":20.4,"ar":0.2065,"asm":14.9},{"i":"테라스_8","c":13,"e":"Terrace","n":8,"cr":0,"ext":0,"x":-18.3,"z":-55.5,"ar":0.0571,"asm":4.1},{"i":"공지_2","c":16,"e":"Open Space","n":2,"cr":0,"ext":1,"face":"N","off":84.5,"viewOnly":1},{"i":"테라스_7","c":13,"e":"Terrace","n":7,"cr":0,"ext":0,"x":37.0,"z":-22.2,"ar":0.0278,"asm":2.0},{"i":"공지_4","c":16,"e":"Open Space","n":4,"cr":0,"ext":1,"face":"E","off":84.5,"viewOnly":1},{"i":"메인도로_1","c":2,"e":"Main Road","n":1,"cr":0,"ext":1,"face":"E","off":111.0,"viewOnly":1},{"i":"공지_3","c":16,"e":"Open Space","n":3,"cr":0,"ext":1,"face":"W","off":84.5,"viewOnly":1}],"e":[["주변매스_14","공지_11",1.0],["공지_1","화장실_4",0.2],["공지_1","임대_5",0.4],["E.V_7","설비_15",0.0],["E.V_7","설비_16",0.0],["E.V_7","계단실_11",0.5],["설비_15","화장실_4",0.5],["설비_15","설비_16",0.0],["설비_16","화장실_4",0.5],["설비_16","계단실_11",0.0],["화장실_4","임대_5",0.5],["임대_5","테라스_8",0.4],["임대_5","공지_2",0.4],["임대_5","테라스_7",0.5],["임대_5","계단실_11",0.5],["테라스_8","공지_4",1.0],["공지_4","메인도로_1",1.0],["공지_3","계단실_11",0.4],["계단실_11","테라스_7",0.4],["테라스_7","공지_2",1.0]],"area":72.0},{"l":"7","raw":"7","n":[{"i":"공지_1","c":16,"e":"Open Space","n":1,"cr":0,"ext":1,"face":"S","off":84.5,"viewOnly":1},{"i":"화장실_5","c":10,"e":"Restroom","n":5,"cr":0,"ext":0,"x":38.2,"z":9.4,"ar":0.0501,"asm":3.4},{"i":"테라스_10","c":13,"e":"Terrace","n":10,"cr":0,"ext":0,"x":-16.6,"z":-50.8,"ar":0.0664,"asm":4.5},{"i":"E.V_8","c":8,"e":"Elevator","n":8,"cr":1,"ext":0,"x":-25.5,"z":13.6,"ar":0.0715,"asm":4.9},{"i":"설비_17","c":7,"e":"MEP","n":17,"cr":0,"ext":0,"x":1.7,"z":44.2,"ar":0.0089,"asm":0.6},{"i":"설비_18","c":7,"e":"MEP","n":18,"cr":0,"ext":0,"x":-43.3,"z":8.5,"ar":0.0102,"asm":0.7},{"i":"계단실_12","c":9,"e":"Staircase","n":12,"cr":1,"ext":0,"x":20.4,"z":20.4,"ar":0.217,"asm":14.9},{"i":"임대_6","c":1,"e":"Leasable Unit","n":6,"cr":0,"ext":0,"x":0.0,"z":0.0,"ar":0.5468,"asm":37.5},{"i":"공지_2","c":16,"e":"Open Space","n":2,"cr":0,"ext":1,"face":"N","off":84.5,"viewOnly":1},{"i":"테라스_9","c":13,"e":"Terrace","n":9,"cr":0,"ext":0,"x":37.6,"z":-22.0,"ar":0.0292,"asm":2.0},{"i":"공지_4","c":16,"e":"Open Space","n":4,"cr":0,"ext":1,"face":"E","off":84.5,"viewOnly":1},{"i":"메인도로_1","c":2,"e":"Main Road","n":1,"cr":0,"ext":1,"face":"E","off":111.0,"viewOnly":1},{"i":"공지_3","c":16,"e":"Open Space","n":3,"cr":0,"ext":1,"face":"W","off":84.5,"viewOnly":1}],"e":[["공지_1","화장실_5",0.2],["공지_1","테라스_10",1.0],["E.V_8","설비_17",0.0],["E.V_8","설비_18",0.0],["E.V_8","계단실_12",0.5],["설비_17","화장실_5",0.5],["설비_17","설비_18",0.0],["설비_18","화장실_5",0.5],["설비_18","계단실_12",0.0],["화장실_5","임대_6",0.5],["임대_6","테라스_10",0.5],["임대_6","공지_2",0.4],["임대_6","테라스_9",0.5],["임대_6","계단실_12",0.5],["테라스_10","공지_4",1.0],["테라스_10","공지_2",1.0],["공지_4","메인도로_1",1.0],["공지_3","계단실_12",0.4],["계단실_12","테라스_9",0.4],["테라스_9","공지_2",1.0]],"area":68.5},{"l":"8","raw":"8","n":[{"i":"공지_1","c":16,"e":"Open Space","n":1,"cr":0,"ext":1,"face":"S","off":84.5,"viewOnly":1},{"i":"화장실_6","c":10,"e":"Restroom","n":6,"cr":0,"ext":0,"x":38.2,"z":9.4,"ar":0.0536,"asm":3.4},{"i":"임대_7","c":1,"e":"Leasable Unit","n":7,"cr":0,"ext":0,"x":0.0,"z":0.0,"ar":0.5857,"asm":37.5},{"i":"E.V_9","c":8,"e":"Elevator","n":9,"cr":1,"ext":0,"x":-25.5,"z":13.6,"ar":0.0766,"asm":4.9},{"i":"설비_19","c":7,"e":"MEP","n":19,"cr":0,"ext":0,"x":1.7,"z":44.2,"ar":0.0095,"asm":0.6},{"i":"설비_20","c":7,"e":"MEP","n":20,"cr":0,"ext":0,"x":-43.3,"z":8.5,"ar":0.0109,"asm":0.7},{"i":"계단실_13","c":9,"e":"Staircase","n":13,"cr":1,"ext":0,"x":20.4,"z":20.4,"ar":0.2324,"asm":14.9},{"i":"공지_4","c":16,"e":"Open Space","n":4,"cr":0,"ext":1,"face":"E","off":84.5,"viewOnly":1},{"i":"공지_2","c":16,"e":"Open Space","n":2,"cr":0,"ext":1,"face":"N","off":84.5,"viewOnly":1},{"i":"테라스_11","c":13,"e":"Terrace","n":11,"cr":0,"ext":0,"x":27.2,"z":-27.5,"ar":0.0313,"asm":2.0},{"i":"메인도로_1","c":2,"e":"Main Road","n":1,"cr":0,"ext":1,"face":"E","off":111.0,"viewOnly":1},{"i":"공지_3","c":16,"e":"Open Space","n":3,"cr":0,"ext":1,"face":"W","off":84.5,"viewOnly":1}],"e":[["공지_1","화장실_6",0.2],["공지_1","임대_7",0.4],["E.V_9","설비_19",0.0],["E.V_9","설비_20",0.0],["E.V_9","계단실_13",0.5],["설비_19","화장실_6",0.5],["설비_19","설비_20",0.0],["설비_20","화장실_6",0.5],["설비_20","계단실_13",0.0],["화장실_6","임대_7",0.5],["임대_7","공지_4",0.4],["임대_7","공지_2",0.4],["임대_7","테라스_11",0.5],["임대_7","계단실_13",0.5],["공지_4","메인도로_1",1.0],["공지_3","계단실_13",0.4],["계단실_13","테라스_11",0.4],["테라스_11","공지_2",1.0]],"area":64.0}];
+const CORE_SEGS  = [{"cls":8,"from":"B1","to":"8","x":-25.5,"z":13.6,"bw":0.064,"bd":0.064,"label":"EV B1F~8F"},{"cls":9,"from":"1","to":"8","x":20.4,"z":20.4,"bw":0.076,"bd":0.064,"label":"Stair 1F~8F"},{"cls":9,"from":"B1","to":"2","x":-20.4,"z":20.4,"bw":0.076,"bd":0.064,"label":"Stair B1F~2F"},{"cls":9,"from":"2","to":"3","x":-20.4,"z":-20.4,"bw":0.076,"bd":0.064,"label":"Stair 2F~3F"}];
+const VMEP         = [["1","설비_5","설비_7"],["1","설비_6","설비_8"],["2","설비_7","설비_9"],["2","설비_8","설비_10"],["3","설비_9","설비_11"],["3","설비_10","설비_12"],["3","화장실_1","화장실_2"],["4","설비_11","설비_13"],["4","설비_12","설비_14"],["4","화장실_2","화장실_3"],["5","설비_13","설비_15"],["5","설비_14","설비_16"],["5","화장실_3","화장실_4"],["6","설비_15","설비_17"],["6","설비_16","설비_18"],["6","화장실_4","화장실_5"],["7","설비_17","설비_19"],["7","설비_18","설비_20"],["7","화장실_5","화장실_6"]];
+const VMEP_CLUSTER = [["2","임대_1","임대_2"],["3","임대_2","임대_3"],["4","임대_3","임대_4"],["5","임대_4","임대_5"],["6","임대_5","임대_6"],["7","임대_6","임대_7"]];  // w=0 programmatic cluster edges
+const VERT_CONT  = {"E.V_2":9,"E.V_1":9,"E.V_3":9,"E.V_4":9,"E.V_5":9,"E.V_6":9,"E.V_7":9,"E.V_8":9,"E.V_9":9,"계단실_2":3,"계단실_1":3,"계단실_4":3,"계단실_5":8,"계단실_3":8,"계단실_7":8,"계단실_9":8,"계단실_10":8,"계단실_11":8,"계단실_12":8,"계단실_13":8,"설비_7":8,"설비_5":8,"설비_9":8,"설비_11":8,"설비_13":8,"설비_15":8,"설비_17":8,"설비_19":8,"설비_8":8,"설비_6":8,"설비_10":8,"설비_12":8,"설비_14":8,"설비_16":8,"설비_18":8,"설비_20":8,"계단실_8":2,"계단실_6":2,"화장실_2":6,"화장실_1":6,"화장실_3":6,"화장실_4":6,"화장실_5":6,"화장실_6":6};
+const VC_CLUSTER = {"임대_2":7,"임대_1":7,"임대_3":7,"임대_4":7,"임대_5":7,"임대_6":7,"임대_7":7};  // w=0 programmatic cluster
+const STATS      = [{"floor":"B1","label":"B1","total_area":86.7,"num_int_nodes":6,"num_ext_nodes":0,"num_edges":6,"strong_edges":1,"by_cls":{"5":61.9,"9":7.6,"23":11.1,"8":6.0}},{"floor":"1","label":"1","total_area":38.2,"num_int_nodes":8,"num_ext_nodes":8,"num_edges":21,"strong_edges":7,"by_cls":{"8":4.9,"7":1.3,"6":20.7,"9":11.3}},{"floor":"2","label":"2","total_area":67.6,"num_int_nodes":8,"num_ext_nodes":8,"num_edges":24,"strong_edges":9,"by_cls":{"9":27.2,"13":2.7,"1":31.5,"8":4.9,"7":1.3}},{"floor":"3","label":"3","total_area":72.0,"num_int_nodes":9,"num_ext_nodes":8,"num_edges":25,"strong_edges":6,"by_cls":{"10":3.4,"1":37.6,"13":2.0,"9":22.8,"8":4.9,"7":1.3}},{"floor":"4","label":"4","total_area":71.3,"num_int_nodes":8,"num_ext_nodes":8,"num_edges":24,"strong_edges":8,"by_cls":{"10":3.4,"1":37.1,"13":9.7,"8":4.9,"7":1.3,"9":14.9}},{"floor":"5","label":"5","total_area":67.2,"num_int_nodes":8,"num_ext_nodes":6,"num_edges":23,"strong_edges":6,"by_cls":{"10":3.4,"1":37.1,"8":4.9,"7":1.3,"9":14.9,"13":5.6}},{"floor":"6","label":"6","total_area":72.0,"num_int_nodes":8,"num_ext_nodes":7,"num_edges":20,"strong_edges":4,"by_cls":{"10":3.4,"1":41.4,"8":4.9,"7":1.3,"9":14.9,"13":6.1}},{"floor":"7","label":"7","total_area":68.5,"num_int_nodes":8,"num_ext_nodes":5,"num_edges":20,"strong_edges":5,"by_cls":{"10":3.4,"13":6.5,"8":4.9,"7":1.3,"9":14.9,"1":37.5}},{"floor":"8","label":"8","total_area":64.0,"num_int_nodes":7,"num_ext_nodes":5,"num_edges":18,"strong_edges":2,"by_cls":{"10":3.4,"1":37.5,"8":4.9,"7":1.3,"9":14.9,"13":2.0}}];
+const CLS_GLOBAL = {"5":61.9,"9":143.2,"23":11.1,"8":45.2,"7":10.5,"6":20.7,"19":0.0,"13":34.6,"1":259.6,"10":20.6};
+const CLS_COLOR  = {"1":"#3A8DDD","2":"#888780","3":"#DD6622","4":"#AA8833","5":"#8888AA","6":"#9966CC","7":"#CC4499","8":"#EE2222","9":"#EE2222","10":"#BB3388","11":"#AA5522","12":"#9966AA","13":"#8B7014","14":"#888780","15":"#9966AA","16":"#1D9E75","17":"#1D9E75","18":"#888780","19":"#9966AA","20":"#CC4499","21":"#CC4499","22":"#CC4499","23":"#888888","24":"#66AACC","25":"#88AACC"};
+const CLS_LABEL  = {"1":"Leasable Unit","2":"Main Road","3":"Corridor","4":"Vestibule","5":"Water Tank","6":"Hall/Lobby","7":"MEP Room","8":"Elevator","9":"Staircase","10":"Restroom","11":"Management","12":"Storage","13":"Terrace","14":"Secondary Road","15":"Parking Entrance","16":"Open Space","17":"Green Space","18":"Surrounding Mass","19":"Parking Lot","20":"Mechanical Room","21":"Disaster Prev.","22":"Electrical","23":"PIT","24":"Sunken Court","25":"Dry Area"};
+
+// ── Tab switching ──────────────────────────────────────────────
+function switchTab(id,el){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  el.classList.add('active');
+  if(id==='d2'&&!d2_init)initD2();
+  if(id==='d3'&&!d3_init)initD3();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ── OVERVIEW ───────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded',function(){
+  // Floor table
+  const tb=document.getElementById('floor-tbody');
+  STATS.forEach(s=>{
+    const tr=document.createElement('tr');
+    const lbl=METADATA.floor_labels.includes(s.floor)?s.floor:s.label;
+    tr.innerHTML=`<td><b>${lbl}</b></td><td>${s.total_area}</td>`+
+      `<td>${s.num_int_nodes}</td><td>${s.num_edges}</td>`+
+      `<td>${s.strong_edges}</td>`;
+    tb.appendChild(tr);
+  });
+
+  // Class distribution bars
+  const total=Object.values(CLS_GLOBAL).reduce((a,b)=>a+b,0)||1;
+  const sorted=Object.entries(CLS_GLOBAL).sort((a,b)=>b[1]-a[1]);
+  const barsEl=document.getElementById('cls-bars');
+  const legEl=document.getElementById('cls-legend');
+  sorted.slice(0,10).forEach(([cls,area])=>{
+    const pct=(area/total*100).toFixed(1);
+    const w=Math.max(2,(area/total*100));
+    const col=CLS_COLOR[cls]||'#888';
+    const lbl=CLS_LABEL[cls]||'cls'+cls;
+    const div=document.createElement('div');
+    div.style.cssText='display:flex;align-items:center;gap:6px;margin-bottom:4px;font-size:11px';
+    div.innerHTML=`<span style="width:80px;text-align:right;color:#666">${lbl}</span>`+
+      `<div style="flex:1;background:#f0f1f5;border-radius:3px;height:12px">`+
+      `<div style="width:${w}%;background:${col};height:100%;border-radius:3px"></div></div>`+
+      `<span style="width:42px;color:#555">${area.toFixed(0)}㎡</span>`+
+      `<span style="width:36px;color:#aaa">${pct}%</span>`;
+    barsEl.appendChild(div);
+    const li=document.createElement('div');li.className='cls-item';
+    li.innerHTML=`<div class="cls-dot" style="background:${col}"></div>${lbl}`;
+    legEl.appendChild(li);
+  });
+
+  // Vertical continuity
+  const vc=document.getElementById('vert-info');
+  const byFloors={};
+  Object.entries(VERT_CONT).forEach(([nid,cnt])=>{
+    if(!byFloors[cnt])byFloors[cnt]=[];
+    byFloors[cnt].push(nid);
+  });
+  const lines=Object.entries(byFloors).sort((a,b)=>b[0]-a[0]).map(([cnt,nids])=>{
+    const sample=nids.slice(0,3).join(', ')+(nids.length>3?` …(+${nids.length-3})`:'');
+    return `<span style="display:inline-block;background:#fff4e6;border:1px solid #ffb74d;border-radius:5px;padding:2px 8px;margin:2px;font-size:11px">🔴 ↕ ${cnt}F · ${sample}</span>`;
+  });
+  // Programmatic clusters (w=0)
+  const byFloorsCl={};
+  Object.entries(VC_CLUSTER).forEach(([nid,cnt])=>{
+    if(!byFloorsCl[cnt])byFloorsCl[cnt]=[];
+    byFloorsCl[cnt].push(nid);
+  });
+  const linesCl=Object.entries(byFloorsCl).sort((a,b)=>b[0]-a[0]).map(([cnt,nids])=>{
+    const sample=nids.slice(0,3).join(', ')+(nids.length>3?` …(+${nids.length-3})`:'');
+    return `<span style="display:inline-block;background:#e8f0ff;border:1px solid #90b4e8;border-radius:5px;padding:2px 8px;margin:2px;font-size:11px">🔵 cluster ↕ ${cnt}F · ${sample}</span>`;
+  });
+  vc.innerHTML=(lines.join('') + linesCl.join('')) || '<span style="color:#aaa">No vertical continuity detected</span>';
+});
+
+// ═══════════════════════════════════════════════════════════════
+// ── 2D GRAPH ───────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+let d2_init=false, d2_sim=null, d2_nS=null, d2_eS=null, d2_rS=null;
+const FD={leasable:true,core:true,mep:true,circ:true,terrace:true,storage:true,ext:true,mass:true};
+
+function fG(n){
+  if(n.ext)return(n.c===18||n.c===2||n.c===14)?'mass':'ext';
+  if(n.c===1)return'leasable';if(n.c===8||n.c===9)return'core';
+  if(n.c===7||n.c===10)return'mep';if([3,4,5,6].includes(n.c))return'circ';
+  if(n.c===13)return'terrace';if([11,12,15,19].includes(n.c))return'storage';
+  return'circ';}
+function tF(k){FD[k]=!FD[k];document.getElementById('f-'+k).classList.toggle('on',FD[k]);applyF();}
+function rF(){Object.keys(FD).forEach(k=>FD[k]=true);document.querySelectorAll('.fbtn').forEach(b=>{if(b.id.startsWith('f-'))b.classList.add('on');});applyF();}
+function applyF(){if(!d2_nS)return;d2_nS.attr('display',d=>FD[fG(d)]?null:'none');d2_eS.attr('display',d=>FD[fG(d.source)]&&FD[fG(d.target)]?null:'none');d2_rS&&d2_rS.attr('display',d=>FD[fG(d)]?null:'none');}
+
+function nColor2(c,ext){if(ext)return(c===18||c===2||c===14)?'#888780':'#1D9E75';return CLS_COLOR[c]||'#888';}
+function nR2(ar,ext){return ext?14:Math.max(13,Math.min(46,Math.sqrt(ar||.005)*72));}
+function shortLbl(id){
+  const m={'임대':'Leas','테라스':'Terr','계단실':'Stai','화장실':'WC','설비':'MEP',
+    '복도':'Corr','창고':'Stor','관리실':'Mgmt','방풍실':'Wind','주차장':'Park',
+    '공지':'OpSp','메인도로':'Road','주변매스':'Mass','E.V':'EV','부도로':'Sec',
+    'Leasable':'Leas','Staircase':'Stai','Elevator':'EV','Restroom':'WC',
+    'Corridor':'Corr','Storage':'Stor','Terrace':'Terr','MEP':'MEP'};
+  let s=id;
+  for(const[k,v] of Object.entries(m)){if(s.startsWith(k)){s=v+(s.replace(k,'').replace(/^_/,''));break;}}
+  return s.slice(0,7);}
+
+function faceXY2(f,idx,total,W,H){
+  // sc 동적 조정: 노드 수가 많을수록 간격 축소
+  const maxW=(f==='N'||f==='S')?(W-108):(H-108);
+  const minSc=32, maxSc=68;
+  const sc=total<=1?maxSc:Math.max(minSc,Math.min(maxSc,Math.floor(maxW/(total-1))));
+  const pad=Math.max(40,54-Math.max(0,total-4)*3);
+  const off=(idx-(total-1)/2)*sc;
+  if(f==='N')return{fx:W/2+off,fy:pad};if(f==='S')return{fx:W/2+off,fy:H-pad};
+  if(f==='E')return{fx:W-pad,fy:H/2+off};if(f==='W')return{fx:pad,fy:H/2+off};
+  return null;}
+
+function buildD2Stats(fl){
+  const int=fl.n.filter(n=>!n.ext);
+  const sum=ns=>ns.reduce((a,n)=>a+(n.asm||0),0);
+  const tot=fl.area||sum(int)||1;
+  const pct=ns=>((sum(ns)/tot)*100).toFixed(0)+'%';
+  const L=int.filter(n=>n.c===1),K=int.filter(n=>n.cr),S=int.filter(n=>!n.cr&&[7,10].includes(n.c)),T=int.filter(n=>n.c===13);
+  const se=fl.e.filter(e=>e[2]>=.9).length,ext=fl.n.filter(n=>n.ext).length;
+  const vc=int.filter(n=>VERT_CONT[n.i]&&VERT_CONT[n.i]>1).length;
+  return `<b>${fl.l}</b> · ${tot.toFixed?tot.toFixed(0):tot}㎡ GFA &nbsp;·&nbsp; `+
+    `<span style="color:#3A8DDD">Leas ${sum(L).toFixed(0)}㎡ (${pct(L)})</span> &nbsp;`+
+    `<span style="color:#EE2222">Core ${sum(K).toFixed(0)}㎡</span> &nbsp;`+
+    `<span style="color:#BB3388">WC ${sum(S).toFixed(0)}㎡</span>`+
+    (sum(T)>0?` &nbsp;<span style="color:#8B7014">Terr ${sum(T).toFixed(0)}㎡</span>`:'')+
+    ` &nbsp;·&nbsp; ${se} strong edges &nbsp;·&nbsp; ${ext} ext &nbsp;·&nbsp; `+
+    `<span style="color:#FF8C00">↕${vc} vert.cont</span>`;}
+
+function initD2(){
+  d2_init=true;
+  // Build floor tabs
+  const tabDiv=document.getElementById('d2-tabs');
+  FLOORS.forEach((fl,i)=>{
+    const b=document.createElement('button');
+    b.className='ftab'+(i===0?' active':'');
+    b.textContent=fl.l;
+    b.onclick=()=>{document.querySelectorAll('.ftab').forEach(x=>x.classList.remove('active'));b.classList.add('active');drawD2(fl);};
+    tabDiv.appendChild(b);
+  });
+  drawD2(FLOORS[0]);
+}
+
+function drawD2(fl){
+  if(d2_sim)d2_sim.stop();
+  const svgEl=document.getElementById('d2-svg');
+  const W=svgEl.clientWidth||660,H=500;
+  svgEl.setAttribute('viewBox',`0 0 ${W} ${H}`);
+  document.getElementById('d2-stat').innerHTML=buildD2Stats(fl);
+
+  // Use D3 if available, else draw simple SVG
+  if(typeof d3==='undefined'){drawD2Simple(fl,svgEl,W,H);return;}
+
+  const svg=d3.select('#d2-svg');svg.selectAll('*').remove();
+
+  // Compass
+  svg.append('g').attr('opacity',.055).call(g=>{
+    g.append('line').attr('x1',W/2).attr('y1',28).attr('x2',W/2).attr('y2',H-28).attr('stroke','#888').attr('stroke-width',1);
+    g.append('line').attr('x1',28).attr('y1',H/2).attr('x2',W-28).attr('y2',H/2).attr('stroke','#888').attr('stroke-width',1);
+  });
+  [['N',W/2,14],['S',W/2,H-8],['E',W-7,H/2],['W',13,H/2]].forEach(([t,x,y])=>{
+    svg.append('text').attr('x',x).attr('y',y).attr('text-anchor','middle').attr('dominant-baseline','middle')
+      .attr('font-size',10).attr('fill','#bbb').attr('font-weight','600').text(t);
+  });
+
+  const nodes=fl.n.map(n=>({...n,id:n.i}));
+  const nodeMap=new Map(nodes.map(n=>[n.id,n]));
+  const seen=new Map();
+  fl.e.forEach(([s,t,w])=>{const k=[s,t].sort().join('||');if(!seen.has(k)||w>seen.get(k)[2])seen.set(k,[s,t,w]);});
+  const links=[...seen.values()].filter(([s,t])=>nodeMap.has(s)&&nodeMap.has(t)).map(([s,t,w])=>({source:s,target:t,w}));
+
+  const fg={};
+  nodes.forEach(n=>{if(!n.ext)return;const f=n.face||'N';n._face=f;if(!fg[f])fg[f]=[];fg[f].push(n);});
+  Object.entries(fg).forEach(([f,grp])=>grp.forEach((n,i)=>{const a=faceXY2(f,i,grp.length,W,H);if(a){n.fx=a.fx;n.fy=a.fy;}}));
+  nodes.filter(n=>n.c===1&&!n.ext).forEach(n=>{n.fx=W/2;n.fy=H/2;});
+  nodes.filter(n=>!n.ext&&n.c!==1).forEach(n=>{if(!n.x){n.x=W/2+(Math.random()-.5)*80;n.y=H/2+(Math.random()-.5)*80;}});
+
+  d2_sim=d3.forceSimulation(nodes)
+    .force('link',d3.forceLink(links).id(d=>d.id)
+      .distance(d=>{const b=d.source.ext||d.target.ext?85:70;return d.w>=1?b*.62:d.w>=.5?b:b*1.5;})
+      .strength(d=>d.w>=.9?1.0:d.w>=.4?0.7:0.28))
+    .force('charge',d3.forceManyBody().strength(d=>d.ext?-12:d.c===1?-50:-95))
+    .force('collide',d3.forceCollide().radius(d=>nR2(d.ar,d.ext)+5).strength(.88))
+    .force('x',d3.forceX(W/2).strength(.022)).force('y',d3.forceY(H/2).strength(.022))
+    .alphaDecay(.024).velocityDecay(.44);
+
+  const gE=svg.append('g'),gR=svg.append('g'),gN=svg.append('g');
+  const eS=gE.selectAll('line').data(links).join('line')
+    .attr('stroke',d=>d.w>=.9?'#EE2222':d.w>=.4?'#3A8DDD':'#CCCCCC')
+    .attr('stroke-width',d=>d.w>=.9?2.8:d.w>=.4?1.6:.9)
+    .attr('stroke-dasharray',d=>d.w===0?'5,3':null)
+    .attr('stroke-opacity',d=>d.w>=0.9 ? 0.80 : d.w>=0.4 ? 0.62 : 0.38).attr('stroke-linecap','round');
+  d2_eS=eS;
+
+  const vcN=nodes.filter(n=>!n.ext&&VERT_CONT[n.i]&&VERT_CONT[n.i]>1);
+  const rS=gR.selectAll('g').data(vcN).join('g');
+  rS.append('circle').attr('r',d=>nR2(d.ar,d.ext)+5.5).attr('fill','none').attr('stroke','#FF8C00').attr('stroke-width',2).attr('stroke-dasharray','3 2').attr('stroke-opacity',.72);
+  rS.append('rect').attr('x',d=>nR2(d.ar,d.ext)+2).attr('y',d=>-nR2(d.ar,d.ext)-14).attr('width',22).attr('height',13).attr('rx',4).attr('fill','#FF8C00').attr('fill-opacity',.92);
+  rS.append('text').text(d=>`↕${VERT_CONT[d.i]}F`).attr('x',d=>nR2(d.ar,d.ext)+13).attr('y',d=>-nR2(d.ar,d.ext)-5).attr('text-anchor','middle').attr('font-size',7.5).attr('font-weight','bold').attr('fill','white').attr('pointer-events','none');
+  d2_rS=rS;
+
+  const nS=gN.selectAll('g').data(nodes).join('g').attr('cursor','pointer')
+    .call(d3.drag()
+      .on('start',(ev,d)=>{if(!ev.active)d2_sim.alphaTarget(.3).restart();d.fx=d.x;d.fy=d.y;})
+      .on('drag',(ev,d)=>{d.fx=ev.x;d.fy=ev.y;})
+      .on('end',(ev,d)=>{if(!ev.active)d2_sim.alphaTarget(0);if(!d.ext&&d.c!==1){d.fx=null;d.fy=null;}}))
+    .on('click',(ev,d)=>{
+      ev.stopPropagation();
+      const conn=new Set();links.forEach(l=>{if(l.source.id===d.id)conn.add(l.target.id);if(l.target.id===d.id)conn.add(l.source.id);});
+      const nc=links.filter(l=>l.source.id===d.id||l.target.id===d.id).length;
+      const aS=d.asm>0?` · <b>${d.asm}㎡</b> (${(d.ar*100).toFixed(1)}%)`:'';
+      const fS=d.ext?` · <span style="color:#1D9E75">ext [${d._face||'?'}]</span>`:'';
+      const vS=VERT_CONT[d.i]
+        ?` · <span style="color:#FF8C00">↕${VERT_CONT[d.i]}F physical</span>`
+        :VC_CLUSTER[d.i]
+          ?` · <span style="color:#3A8DDD">↕${VC_CLUSTER[d.i]}F cluster</span>`
+          :'';
+      document.getElementById('d2-info').innerHTML=`<b>${d.e||d.i}</b> · class ${d.c} · ${nc} connections${aS}${fS}${vS}`;
+      eS.attr('stroke-opacity',l=>(l.source.id===d.id||l.target.id===d.id)?1:.07);
+      nS.select('circle').attr('opacity',n=>n.id===d.id||conn.has(n.id)?1:.15);
+      rS.attr('opacity',n=>n.id===d.id||conn.has(n.id)?1:.12);
+    });
+  svg.on('click',()=>{eS.attr('stroke-opacity',d=>d.w>=0.9 ? 0.80 : d.w>=0.4 ? 0.62 : 0.38);nS.select('circle').attr('opacity',1);rS.attr('opacity',1);document.getElementById('d2-info').textContent='Click node for details · Orange dashed ring = vertical continuity · N/S/E/W compass layout';});
+
+  nS.filter(d=>d.ext&&d._face).append('text').text(d=>d._face).attr('text-anchor','middle').attr('dy','-1.4em').attr('font-size',8).attr('fill','#aaa').attr('font-weight','700').attr('pointer-events','none');
+  nS.append('circle').attr('r',d=>nR2(d.ar,d.ext)).attr('fill',d=>nColor2(d.c,d.ext)).attr('fill-opacity',d=>d.ext ? 0.68 : 0.88).attr('stroke',d=>d.ext?'rgba(120,120,120,.5)':d.cr?'#CC0000':'rgba(255,255,255,.45)').attr('stroke-width',d=>d.cr?2.2:1.1).attr('stroke-dasharray',d=>d.ext?'4,2':null);
+  nS.append('text').text(d=>shortLbl(d.i)).attr('text-anchor','middle').attr('dy','.35em').attr('font-size',d=>d.c===1?11:9.5).attr('font-weight',d=>d.c===1?'bold':'normal').attr('fill','white').attr('pointer-events','none');
+  nS.filter(d=>!d.ext&&d.ar>=.08).append('text').text(d=>(d.ar*100).toFixed(0)+'%').attr('text-anchor','middle').attr('dy','1.55em').attr('font-size',7).attr('fill','rgba(255,255,255,.72)').attr('pointer-events','none');
+  d2_nS=nS;
+
+  const p=30;
+  d2_sim.on('tick',()=>{
+    eS.attr('x1',d=>cl(d.source.x,p,W-p)).attr('y1',d=>cl(d.source.y,p,H-p)).attr('x2',d=>cl(d.target.x,p,W-p)).attr('y2',d=>cl(d.target.y,p,H-p));
+    nS.attr('transform',d=>`translate(${cl(d.x,p,W-p)},${cl(d.y,p,H-p)})`);
+    rS.attr('transform',d=>`translate(${cl(d.x,p,W-p)},${cl(d.y,p,H-p)})`);
+  });
+  applyF();d2_sim.restart();
+}
+function cl(v,lo,hi){return Math.max(lo,Math.min(hi,v));}
+
+// ═══════════════════════════════════════════════════════════════
+// ── 3D VIEW ────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+let d3_init=false;
+const SC=1/78,GAP=148;
+const FL_ALL=FLOORS.map(f=>f.raw);
+function getY(r){return FL_ALL.indexOf(r)*GAP;}
+const FV={N:{x:0,z:1},S:{x:0,z:-1},E:{x:1,z:0},W:{x:-1,z:0}};
+function fC3(f,o){const d=FV[f];return new THREE.Vector3(d.x*o*SC,0,d.z*o*SC);}
+function slabSz3(f,w){const NS=f==='N'||f==='S';return NS?{sw:(72*2+4)*SC,sd:w*SC}:{sw:w*SC,sd:(72*2+4)*SC};}
+function nClr3(c){return parseInt((CLS_COLOR[c]||'#888888').replace('#','0x'));}
+function getR3(ar){return Math.max(.028,Math.min(.16,Math.sqrt(ar||.02)*.40));}
+const GROUND3=new Set(FL_ALL.slice(0,Math.min(3,FL_ALL.length)));
+const PAPER_RX=0.25,PAPER_RY=0.42;
+const G3={ext:[],cor:[],slab:[],he:[],ve:[],ce:[],lbl:[]};
+let NP=new Map(),EP=new Map(); // global for w=0 cluster script
+const FGO3={};
+let renderer3,cam3,scene3,pivot3,panG3,rY3=PAPER_RY,rX3=PAPER_RX,panX3=0,panY3=0;
+let clickable3=[];const lblM3=[];
+
+function initD3(){
+  d3_init=true;
+  const canvas=document.getElementById('d3-canvas');
+  const W=canvas.parentElement.clientWidth||660,H=560;
+  canvas.width=W;canvas.height=H;
+  renderer3=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+  renderer3.setSize(W,H);renderer3.setPixelRatio(Math.min(devicePixelRatio,2));
+  renderer3.setClearColor(0,0);
+  scene3=new THREE.Scene();
+  cam3=new THREE.PerspectiveCamera(20,W/H,.1,500);
+  cam3.position.set(0,14,28);cam3.lookAt(0,7,0);
+  scene3.add(new THREE.AmbientLight(0xffffff,.9));
+  const sun=new THREE.DirectionalLight(0xffffff,.5);sun.position.set(6,14,8);scene3.add(sun);
+  const fl=new THREE.DirectionalLight(0xffffff,.22);fl.position.set(-5,4,-6);scene3.add(fl);
+  panG3=new THREE.Group();scene3.add(panG3);
+  pivot3=new THREE.Group();pivot3.rotation.set(PAPER_RX,PAPER_RY,0);panG3.add(pivot3);
+
+  // Build floor isolate buttons
+  const fiRow=document.getElementById('fi-row');
+  FLOORS.forEach(fl=>{
+    const btn=document.createElement('button');
+    btn.className='fib';btn.id='fi-'+fl.raw;btn.textContent=fl.l;
+    btn.onclick=()=>iso3(fl.raw);fiRow.appendChild(btn);
+  });
+
+  build3D();
+
+  // Controls
+  const c=canvas;
+  let mode='idle',lx=0,ly=0;
+  c.addEventListener('mousedown',e=>{e.preventDefault();mode=(e.button===1||e.altKey)?'pan':'rotate';c.className=mode==='pan'?'pan':'drag';lx=e.clientX;ly=e.clientY;},{passive:false});
+  window.addEventListener('mouseup',()=>{mode='idle';c.className='';});
+  c.addEventListener('mousemove',e=>{if(mode==='idle')return;const dx=e.clientX-lx,dy=e.clientY-ly;if(mode==='rotate'){rY3+=dx*.009;rX3+=dy*.007;rX3=Math.max(-.85,Math.min(.85,rX3));pivot3.rotation.set(rX3,rY3,0);}else{panX3+=dx*.006;panY3-=dy*.006;panG3.position.set(panX3,panY3,0);}lx=e.clientX;ly=e.clientY;});
+  c.addEventListener('wheel',e=>{e.preventDefault();cam3.position.z=Math.max(5,Math.min(45,cam3.position.z+e.deltaY*.016));},{passive:false});
+  let lastD=0,tM='r';
+  c.addEventListener('touchstart',e=>{e.preventDefault();if(e.touches.length===1){tM='r';lx=e.touches[0].clientX;ly=e.touches[0].clientY;}else if(e.touches.length===2){tM='p';lastD=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);}},{passive:false});
+  c.addEventListener('touchmove',e=>{e.preventDefault();if(tM==='r'&&e.touches.length===1){rY3+=(e.touches[0].clientX-lx)*.009;rX3+=(e.touches[0].clientY-ly)*.007;rX3=Math.max(-.85,Math.min(.85,rX3));pivot3.rotation.set(rX3,rY3,0);lx=e.touches[0].clientX;ly=e.touches[0].clientY;}else if(tM==='p'&&e.touches.length===2){const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);cam3.position.z=Math.max(5,Math.min(45,cam3.position.z-(d-lastD)*.04));lastD=d;}},{passive:false});
+  const ray=new THREE.Raycaster(),mp=new THREE.Vector2();
+  c.addEventListener('click',e=>{const r=c.getBoundingClientRect();mp.x=((e.clientX-r.left)/r.width)*2-1;mp.y=-((e.clientY-r.top)/r.height)*2+1;ray.setFromCamera(mp,cam3);const hits=ray.intersectObjects(clickable3);if(hits.length){const d=hits[0].object.userData;const aS=d.asm?` · <b>${d.asm}㎡</b> (${(d.ar*100).toFixed(1)}%)`:'';
+document.getElementById('d3-info').innerHTML=`<b>${d.e}</b> · ${d.flLabel}${aS}`+(d.cr?' <span style="color:#E42">●Core</span>':'');}});
+
+  const qC=new THREE.Quaternion();
+  (function loop(){requestAnimationFrame(loop);cam3.getWorldQuaternion(qC);lblM3.forEach(m=>m.quaternion.copy(qC));renderer3.render(scene3,cam3);})();
+}
+
+function add3(o,b,raw){pivot3.add(o);G3[b].push(o);if(raw){if(!FGO3[raw])FGO3[raw]=[];FGO3[raw].push(o);}}
+function mL3(col,op=1){return new THREE.MeshLambertMaterial({color:col,transparent:op<1,opacity:op});}
+function lM3(col,op=1){return new THREE.LineBasicMaterial({color:col,transparent:op<1,opacity:op});}
+function eL3(geo,col,op){return new THREE.LineSegments(new THREE.EdgesGeometry(geo),lM3(col,op));}
+function bx3(w,h,d,col,op=1){return new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mL3(col,op));}
+function addEBox3(p1,p2,r1,r2,tk,col,op,bkt,raw){
+  const dir=new THREE.Vector3().subVectors(p2,p1).normalize();
+  const len=p1.distanceTo(p2)-r1-r2;if(len<.005)return;
+  const mid=p1.clone().addScaledVector(dir,r1+len/2);
+  const m=new THREE.Mesh(new THREE.BoxGeometry(tk,tk,len),mL3(col,op));
+  m.position.copy(mid);m.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,1),dir);
+  add3(m,bkt,raw);}
+
+function build3D(){
+  const BH_w=(72*2)*SC;
+  NP=new Map();EP=new Map(); // reset globals
+  for(const fl of FLOORS){
+    const fy=getY(fl.raw)*SC;
+    for(const n of fl.n){
+      if(!n.ext)NP.set(fl.raw+'::'+n.i,new THREE.Vector3((n.x||0)*SC,fy,(n.z||0)*SC));
+      else{const cp=fC3(n.face,n.off||84);EP.set(fl.raw+'::'+n.i,new THREE.Vector3(cp.x,fy,cp.z));}
+    }
+  }
+
+  // Slabs
+  for(const fl of FLOORS){
+    const fy=getY(fl.raw)*SC,isG=FL_ALL.indexOf(fl.raw)<3;
+    const th=isG ? 0.055 : 0.012,clr=isG?0x7A7060:0xBBBBCC,op=isG ? 0.76 : 0.07;
+    const s=bx3(BH_w,th,BH_w,clr,op);s.position.y=fy-th/2;add3(s,'slab',fl.raw);
+    const e=eL3(new THREE.BoxGeometry(BH_w,th,BH_w),isG?0x4A4030:0x8899BB,isG ? 0.68 : 0.24);
+    e.position.y=fy-th/2;add3(e,'slab',fl.raw);
+    const tc=document.createElement('canvas');tc.width=200;tc.height=30;
+    const ctx=tc.getContext('2d');ctx.fillStyle=isG?'rgba(65,58,44,.92)':'rgba(50,55,85,.86)';
+    if(ctx.roundRect)ctx.roundRect(0,0,200,30,5);else ctx.rect(0,0,200,30);
+    ctx.fill();ctx.fillStyle='#fff';ctx.font='bold 14px sans-serif';ctx.fillText(fl.l,7,21);
+    const lm=new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(tc),transparent:true,side:THREE.DoubleSide});
+    const lb=new THREE.Mesh(new THREE.PlaneGeometry(1.1,.18),lm);lb.position.set(-2.8,fy+.06,0);lb.userData.isLabel=1;add3(lb,'slab',fl.raw);G3.lbl.push(lb);
+  }
+
+  // Context slabs — 레이어: 공지 → 도로 → 주변매스
+  for(const fl of FLOORS){
+    const fy=getY(fl.raw)*SC,isGnd=GROUND3.has(fl.raw);
+    const fade=isGnd?1:Math.max(.12,1-.3*((getY(fl.raw)-getY(FL_ALL[0]))/GAP));
+    for(const n of fl.n){
+      if(!n.ext||n.mass)continue;
+      const cp=EP.get(fl.raw+'::'+ n.i);if(!cp)continue;
+      const slbW=n.c===2?26.5:n.c===14?22:12.5;
+      const sz=slabSz3(n.face,slbW);
+      if(!n.viewOnly&&isGnd){
+        let sc2,so,ec;
+        if(n.c===2){sc2=0x0E0E0E;so=0.88;ec=0x000000;}
+        else if(n.c===14){sc2=0x3A3A3A;so=0.72;ec=0x222222;}
+        else{sc2=0x1D9E75;so=0.62;ec=0x0A6040;}
+        const s2=bx3(sz.sw,.022,sz.sd,sc2,so);s2.position.set(cp.x,fy,cp.z);add3(s2,'ext',fl.raw);
+        const el2=eL3(new THREE.BoxGeometry(sz.sw,.022,sz.sd),ec,.82);el2.position.set(cp.x,fy,cp.z);add3(el2,'ext',fl.raw);
+        if(n.c===16||n.c===17){
+          const NS=n.face==='N'||n.face==='S';
+          for(let i=-1;i<=1;i++){
+            const dot=new THREE.Mesh(new THREE.CircleGeometry(.02,6),new THREE.MeshBasicMaterial({color:0x0D7050,transparent:true,opacity:.55}));
+            dot.rotation.x=-Math.PI/2;
+            dot.position.set(NS?cp.x+i*sz.sw*.28:cp.x,fy+.014,NS?cp.z:cp.z+i*sz.sd*.28);
+            add3(dot,'ext',fl.raw);
+          }
+        }
+        if(n.c===2||n.c===14){
+          const NS2=n.face==='N'||n.face==='S';
+          const rt=document.createElement('canvas');
+          rt.width=NS2?128:32;rt.height=NS2?32:128;
+          const rc=rt.getContext('2d');
+          rc.fillStyle=n.c===2?'#111':'#3A3A3A';rc.fillRect(0,0,rt.width,rt.height);
+          rc.setLineDash(n.c===2?[8,6]:[6,5]);
+          rc.strokeStyle=n.c===2?'rgba(255,220,0,.70)':'rgba(180,180,180,.55)';
+          rc.lineWidth=n.c===2?2:1.5;rc.beginPath();
+          if(NS2){rc.moveTo(rt.width/2,2);rc.lineTo(rt.width/2,rt.height-2);}
+          else{rc.moveTo(2,rt.height/2);rc.lineTo(rt.width-2,rt.height/2);}
+          rc.stroke();rc.setLineDash([]);
+          const rm=new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(rt),transparent:true,side:THREE.DoubleSide});
+          const rp=new THREE.Mesh(new THREE.PlaneGeometry(sz.sw*.78,sz.sd*.78),rm);
+          rp.rotation.x=-Math.PI/2;rp.position.set(cp.x,fy+.013,cp.z);add3(rp,'ext',fl.raw);
+        }
+        const ltc=document.createElement('canvas');ltc.width=150;ltc.height=22;
+        const lctx=ltc.getContext('2d');
+        const lbg=n.c===2?'rgba(8,8,8,.88)':n.c===14?'rgba(40,40,40,.82)':'rgba(10,100,60,.88)';
+        lctx.fillStyle=lbg;if(lctx.roundRect)lctx.roundRect(0,0,150,22,3);else lctx.rect(0,0,150,22);
+        lctx.fill();lctx.fillStyle='#fff';lctx.font='bold 10px sans-serif';
+        const lname={2:'Main Road',14:'Sec.Road',16:'Open Space',17:'Green'};
+        lctx.fillText((lname[n.c]||n.e||'Context')+' ['+n.face+']',4,15);
+        const llm=new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(ltc),transparent:true,side:THREE.DoubleSide,depthTest:false});
+        const llb=new THREE.Mesh(new THREE.PlaneGeometry(.66,.10),llm);
+        llb.position.set(cp.x,fy+.165,cp.z);llb.userData.isLabel=1;add3(llb,'ext',fl.raw);lblM3.push(llb);
+      }
+      if(n.viewOnly){
+        const d2=new THREE.Mesh(new THREE.SphereGeometry(.018,8,6),mL3(n.c===16||n.c===17?0x1D9E75:0x222222,.20*fade));
+        d2.position.set(cp.x,fy,cp.z);add3(d2,'ext',fl.raw);
+      }
+    }
+  }
+  // Surrounding masses
+  const mRng={};
+  for(const fl of FLOORS){for(const n of fl.n){if(!n.mass)continue;const k=n.face;const fi=FL_ALL.indexOf(fl.raw);if(!mRng[k]){mRng[k]={from:fi,to:fi,off:n.off};}else{mRng[k].from=Math.min(mRng[k].from,fi);mRng[k].to=Math.max(mRng[k].to,fi);}}}
+  for(const [face,{from,to,off}] of Object.entries(mRng)){
+    const cp=fC3(face,off);const mw=BH_w*.72;const h2=mw/2;
+    const yB=from*GAP*SC,yT=to*GAP*SC;const span=yT-yB+GAP*SC*.5,cy=(yB+yT)/2+GAP*SC*.25;
+    const grp=new THREE.Group();grp.add(bx3(mw,span,mw,0x888888,.05));
+    const sfls=[];for(let i=from;i<=to;i++)sfls.push(i);
+    for(const i of sfls){const ly=i*GAP*SC-cy;const sl=new THREE.Mesh(new THREE.BoxGeometry(mw,.015,mw),new THREE.MeshBasicMaterial({color:0x333333,wireframe:true,opacity:.55,transparent:true}));sl.position.y=ly;grp.add(sl);}
+    for(const [cx,cz] of [[-h2,-h2],[h2,-h2],[h2,h2],[-h2,h2]]){const geo=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(cx,-span/2,cz),new THREE.Vector3(cx,span/2,cz)]);grp.add(new THREE.Line(geo,lM3(0x333333,.58)));}
+    grp.add(eL3(new THREE.BoxGeometry(mw,span,mw),0x444444,.60));grp.position.set(cp.x,cy,cp.z);add3(grp,'ext','_mass_'+face);
+  }
+
+  // Core boxes
+  for(const seg of CORE_SEGS){
+    const yB=FL_ALL.indexOf(seg.from)*GAP*SC,yT=FL_ALL.indexOf(seg.to)*GAP*SC+GAP*SC*.38;
+    const span=yT-yB,cy=(yB+yT)/2;const grp=new THREE.Group();
+    grp.add(bx3(seg.bw,span,seg.bd,0xFF2222,.14));grp.add(eL3(new THREE.BoxGeometry(seg.bw,span,seg.bd),0xCC0000,.88));
+    for(let i=FL_ALL.indexOf(seg.from);i<=FL_ALL.indexOf(seg.to);i++){const ring=bx3(seg.bw+.005,.008,seg.bd+.005,0xFF2222,.68);ring.position.y=i*GAP*SC-cy;grp.add(ring);}
+    grp.position.set(seg.x*SC,cy,seg.z*SC);grp.userData={e:seg.label,c:seg.cls,cr:1};add3(grp,'cor',null);
+    const ctc=document.createElement('canvas');ctc.width=180;ctc.height=24;const cctx=ctc.getContext('2d');cctx.fillStyle='rgba(160,10,10,.88)';if(cctx.roundRect)cctx.roundRect(0,0,180,24,4);else cctx.rect(0,0,180,24);cctx.fill();cctx.fillStyle='#fff';cctx.font='bold 11px sans-serif';cctx.fillText(seg.label,5,17);
+    const clm=new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(ctc),transparent:true,side:THREE.DoubleSide,depthTest:false});
+    const clb=new THREE.Mesh(new THREE.PlaneGeometry(.76,.108),clm);clb.position.set(seg.x*SC+.12,yT+.16,seg.z*SC);clb.userData.isLabel=1;add3(clb,'lbl',null);lblM3.push(clb);
+  }
+
+  // MEP V-edges
+  {const pts=[];for(const [sf,sn,tn] of VMEP){const sp=NP.get(sf+'::'+sn);if(!sp)continue;let tp=null;for(const fl of FLOORS){const p=NP.get(fl.raw+'::'+tn);if(p&&Math.abs(p.y-sp.y)>.04){tp=p;break;}}if(!tp)continue;pts.push(sp.x,sp.y,sp.z,tp.x,tp.y,tp.z);}
+  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pts,3));add3(new THREE.LineSegments(g,lM3(0xCC5599,.55)),'ve',null);}
+
+  // Programmatic cluster V-edges (w=0) — 파랑 점선
+  {const pts2=[];for(const [sf,sn,tn] of VMEP_CLUSTER){
+    const sp=NP.get(sf+'::'+ sn);if(!sp)continue;
+    let tp=null;
+    for(const fl of FLOORS){const p=NP.get(fl.raw+'::'+ tn);if(p&&Math.abs(p.y-sp.y)>.04){tp=p;break;}}
+    if(!tp)continue;
+    pts2.push(sp.x,sp.y,sp.z,tp.x,tp.y,tp.z);
+  }
+  if(pts2.length>0){
+    const g2=new THREE.BufferGeometry();g2.setAttribute('position',new THREE.Float32BufferAttribute(pts2,3));
+    const mat2=new THREE.LineDashedMaterial({color:0x3A8DDD,transparent:true,opacity:0.55,dashSize:.10,gapSize:.07});
+    const ls2=new THREE.LineSegments(g2,mat2);ls2.computeLineDistances();
+    add3(ls2,'ve',null);
+  }}
+
+  // Context edges (ground only)
+  for(const fl of FLOORS){if(!GROUND3.has(fl.raw))continue;const fy=getY(fl.raw)*SC;
+    for(const n of fl.n){if(!n.ext||n.mass)continue;const ep=EP.get(fl.raw+'::'+n.i);if(!ep)continue;
+      for(const [s,t,w] of fl.e){if(s!==n.i&&t!==n.i)continue;const oid=s===n.i?t:s;const tp=NP.get(fl.raw+'::'+oid);if(!tp)continue;
+        const lc=n.c===2?0x111111:0x0D7050;add3(new THREE.Line(new THREE.BufferGeometry().setFromPoints([ep.clone(),tp.clone()]),lM3(lc,w>=0.7 ? 0.55 : 0.28)),'ce',fl.raw);
+      }
+    }
+  }
+
+  // H-edges
+  for(const fl of FLOORS){
+    const nm=new Map(fl.n.filter(n=>!n.ext).map(n=>[n.i,NP.get(fl.raw+'::'+n.i)]).filter(([,p])=>p));
+    const rm=new Map(fl.n.filter(n=>!n.ext).map(n=>[n.i,getR3(n.ar||.02)]));
+    const dp=[];
+    for(const [s,t,w] of fl.e){const sp=nm.get(s),tp=nm.get(t);if(!sp||!tp)continue;const r1=rm.get(s)||.04,r2=rm.get(t)||.04;
+      if(w>=.9)addEBox3(sp,tp,r1,r2,.020,0xFF7700,.83,'he',fl.raw);
+      else if(w>=.4)addEBox3(sp,tp,r1,r2,.012,0x3A8DDD,.66,'he',fl.raw);
+      else{const dir=new THREE.Vector3().subVectors(tp,sp).normalize();const len=sp.distanceTo(tp)-r1-r2;if(len<.005)continue;const ps=sp.clone().addScaledVector(dir,r1),pe=tp.clone().addScaledVector(dir,-r2);dp.push(ps.x,ps.y,ps.z,pe.x,pe.y,pe.z);}
+    }
+    if(dp.length){const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(dp,3));const sg=new THREE.LineSegments(g,new THREE.LineDashedMaterial({color:0xAA88CC,transparent:true,opacity:.52,dashSize:.07,gapSize:.05}));sg.computeLineDistances();add3(sg,'he',fl.raw);}
+  }
+
+  // Nodes
+  for(const fl of FLOORS){for(const n of fl.n){if(n.ext)continue;const p=NP.get(fl.raw+'::'+n.i);if(!p)continue;
+    const m=new THREE.Mesh(new THREE.SphereGeometry(getR3(n.ar||.02),14,10),mL3(nClr3(n.c)));
+    m.position.copy(p);m.userData={...n,flLabel:fl.l,flRaw:fl.raw};add3(m,'he',fl.raw);clickable3.push(m);
+  }}
+
+  // Labels (selected floors only)
+  const labelFls=new Set([FL_ALL[0],FL_ALL[Math.floor(FL_ALL.length/2)],FL_ALL[FL_ALL.length-1]]);
+  for(const fl of FLOORS){if(!labelFls.has(fl.raw))continue;
+    const lu=fl.n.find(n=>n.c===1&&!n.ext);if(!lu)continue;const p=NP.get(fl.raw+'::'+lu.i);if(!p)continue;
+    const r=getR3(lu.ar||.02);
+    const lb=mkLbl3('Leasable',`${lu.asm}㎡·${(lu.ar*100).toFixed(0)}%·${fl.l}`,'rgba(18,72,160,.90)');
+    lb.position.set(p.x,p.y+r+.16,p.z);lb.userData.isLabel=1;add3(lb,'lbl',fl.raw);lblM3.push(lb);
+  }
+
+
+  // w=0 programmatic cluster → 파랑 점선 수직선 (NP 채워진 직후)
+  (function(){
+    const _cx={};
+    FLOORS.forEach(function(fl){
+      fl.n.forEach(function(n){
+        if(n.ext||!VC_CLUSTER[n.i])return;
+        const p=NP.get(fl.raw+'::'+n.i);
+        if(p){_cx[n.i]=_cx[n.i]||[];_cx[n.i].push({x:p.x,y:p.y,z:p.z});}
+      });
+    });
+    Object.keys(_cx).forEach(function(nid){
+      const pts=_cx[nid];if(pts.length<2)return;
+      pts.sort(function(a,b){return a.y-b.y;});
+      const g=new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(pts[0].x,pts[0].y,pts[0].z),
+        new THREE.Vector3(pts[pts.length-1].x,pts[pts.length-1].y,pts[pts.length-1].z)]);
+      const m=new THREE.LineDashedMaterial({color:0x3A8DDD,transparent:true,opacity:0.42,dashSize:.10,gapSize:.07});
+      const ln=new THREE.Line(g,m);ln.computeLineDistances();
+      pivot3.add(ln);G3.ve.push(ln);
+    });
+  })();
+}
+
+function mkLbl3(txt,sub,bg){
+  const hs=sub&&sub.length;const tc=document.createElement('canvas');tc.width=200;tc.height=hs?40:27;
+  const ctx=tc.getContext('2d');ctx.fillStyle=bg;if(ctx.roundRect)ctx.roundRect(0,0,200,hs?40:27,5);else ctx.rect(0,0,200,hs?40:27);
+  ctx.fill();ctx.fillStyle='#fff';ctx.font='bold 11px sans-serif';ctx.fillText(txt,6,17);
+  if(hs){ctx.font='10px sans-serif';ctx.fillStyle='rgba(255,255,255,.75)';ctx.fillText(sub,6,30);}
+  const mat=new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(tc),transparent:true,side:THREE.DoubleSide,depthTest:false});
+  return new THREE.Mesh(new THREE.PlaneGeometry(.76,hs ? 0.14 : 0.095),mat);}
+
+function tog3(k){const on=document.getElementById('b-'+k).classList.toggle('on');G3[k].forEach(o=>{o.visible=on;o.traverse&&o.traverse(c=>{c.visible=on;});});}
+function setFlOp3(raw,op){if(!FGO3[raw])return;FGO3[raw].forEach(o=>{o.traverse(ch=>{if(ch.material){if(!ch.userData._bOp)ch.userData._bOp=ch.material.opacity||1;ch.material.opacity=ch.userData._bOp*op;ch.material.transparent=op<1;}})})}
+function iso3(raw){
+  document.querySelectorAll('.fib').forEach(b=>b.classList.remove('active'));
+  const _fiBtn=document.getElementById(raw==='all'?'fi-all':'fi-'+raw);if(_fiBtn)_fiBtn.classList.add('active');
+  if(raw==='all'){
+    FLOORS.forEach(f=>setFlOp3(f.raw,1));
+    // 주변매스: 항상 표시
+    ['N','S','E','W'].forEach(face=>setFlOp3('_mass_'+face,1));
+  } else {
+    FLOORS.forEach(f=>setFlOp3(f.raw,f.raw===raw?1:.12));
+    // 주변매스: 해당 층이 포함된 방향은 표시, 아닌 건 fade
+    // (주변매스는 층 범위로 집계됐으므로 근사: raw가 GROUND3에 있으면 표시)
+    const showMass=GROUND3.has(raw)||FL_ALL.indexOf(raw)<4;
+    ['N','S','E','W'].forEach(face=>setFlOp3('_mass_'+face,showMass?0.85:.08));
+  }
+  document.getElementById('d3-info').innerHTML=raw==='all'?'Click node for details · 📐 locks to paper figure angle':`<b>Floor isolate: ${(FLOORS.find(f=>f.raw===raw)||{}).l||raw}</b>`;}
+function setPV(){rX3=PAPER_RX;rY3=PAPER_RY;pivot3.rotation.set(rX3,rY3,0);panX3=0;panY3=0;panG3.position.set(0,0,0);document.getElementById('d3-info').innerHTML='📐 Paper View — matches publication figure angle';}
+function rst3(){setPV();iso3('all');}
+</script>
+</body>
+</html>
