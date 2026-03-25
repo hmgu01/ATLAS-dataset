@@ -12,7 +12,7 @@ authors:
 repository-code: "https://github.com/hmgu01/ATLAS-dataset"
 doi: "10.5281/zenodo.19225225"
 version: "1.0.0"
-date-released: "2025-03-25"
+date-released: "2026-03-26"
 license: CC-BY-NC-4.0
 keywords:
   - spatial relationship graph
@@ -21,7 +21,7 @@ keywords:
   - generative design
   - South Korea
 abstract: >
-  ATLAS is a spatial relationship graph dataset of 198 multi-tenant neighborhood
+  ATLAS is a spatial relationship graph dataset of 195 multi-tenant neighborhood
   commercial buildings in South Korea. Each building is represented as
   horizontal (intra-floor adjacency) and vertical (inter-floor continuity) graphs
   with 25 node classes including leasable units, circulation, cores, and
