@@ -201,7 +201,7 @@ python scripts/atlas_validate.py --input data/ --report validation_report.csv
                Neighborhood Commercial Buildings},
   year      = {2025},
   publisher = {Zenodo},
-  doi       = {[YOUR_DOI]},
+  doi       = {10.5281/zenodo.19225225},
   url       = {https://github.com/hmgu01/ATLAS-dataset}
 }
 ```
