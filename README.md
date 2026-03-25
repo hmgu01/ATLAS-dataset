@@ -1,7 +1,7 @@
 # ATLAS — Spatial Layout Alternative Generation Model
 ### Dataset & Visualization Tools
 
-[![DOI](https://zenodo.org/badge/DOI/[YOUR_DOI].svg)](https://doi.org/[YOUR_DOI])
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19225225.svg)](https://doi.org/10.5281/zenodo.19225225)
 [![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC_BY--NC_4.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc/4.0/)
 ![Buildings](https://img.shields.io/badge/sample%20buildings-30-blue)
 ![Schema](https://img.shields.io/badge/node%20classes-25-blue)
