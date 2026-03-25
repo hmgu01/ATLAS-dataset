@@ -1,0 +1,28 @@
+cff-version: 1.2.0
+title: "ATLAS: Spatial Relationship Dataset for Multi-Tenant Neighborhood Commercial Buildings"
+message: "If you use this dataset, please cite it as below."
+type: dataset
+authors:
+  - family-names: Gu
+    given-names: Hyeongmo
+    affiliation: "Dept. of Architecture, Kyungpook National University"
+  - family-names: Choo
+    given-names: Seungyeon
+    affiliation: "Dept. of Architecture, Kyungpook National University"
+repository-code: "https://github.com/hmgu01/ATLAS-dataset"
+doi: "[YOUR_DOI]"
+version: "1.0.0"
+date-released: "2025-03-25"
+license: CC-BY-NC-4.0
+keywords:
+  - spatial relationship graph
+  - neighborhood commercial buildings
+  - architectural layout dataset
+  - generative design
+  - South Korea
+abstract: >
+  ATLAS is a spatial relationship graph dataset of 198 multi-tenant neighborhood
+  commercial buildings in South Korea. Each building is represented as
+  horizontal (intra-floor adjacency) and vertical (inter-floor continuity) graphs
+  with 25 node classes including leasable units, circulation, cores, and
+  urban context nodes.
