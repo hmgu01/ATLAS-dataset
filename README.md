@@ -219,6 +219,6 @@ For commercial use, contact the authors.
 
 ## Contact
 
-Hyeongmo Gu — [YOUR_EMAIL]
+Hyeongmo Gu — ghm3186@gmail.com
 Advisor: Prof. Seungyeon Choo
-Dept. of Architecture, Kyungpook National University
+Dept. School of Architecture, Kyungpook National University
