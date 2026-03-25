@@ -15,7 +15,7 @@
 ## Data Availability
 
 This repository contains **30 sample buildings** from the full ATLAS dataset
-(**198 buildings** total). The complete dataset is available upon reasonable
+(**196 buildings** total). The complete dataset is available upon reasonable
 request to the corresponding author.
 
 ---
@@ -195,11 +195,11 @@ python scripts/atlas_validate.py --input data/ --report validation_report.csv
 ## Citation
 
 ```bibtex
-@dataset{atlas_dataset_2025,
+@dataset{atlas_dataset_2026,
   author    = {Hyeongmo Gu and Seungyeon Choo},
   title     = {ATLAS: Spatial Relationship Dataset for Multi-Tenant
                Neighborhood Commercial Buildings},
-  year      = {2025},
+  year      = {2026},
   publisher = {Zenodo},
   doi       = {10.5281/zenodo.19225225},
   url       = {https://github.com/hmgu01/ATLAS-dataset}
