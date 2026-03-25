@@ -1,0 +1,1282 @@
+#!/usr/bin/env python3
+"""
+json_to_viewer.py — ATLAS Dataset Interactive Viewer Generator
+Converts ATLAS JSON graph data into a self-contained HTML viewer
+with three tabs: Overview · 2D Graph · 3D Axonometric.
+
+Usage:
+    python json_to_viewer.py --input <building_dir> --output <out_dir>
+    python json_to_viewer.py --input building_001/ --output viewers/
+
+    # Batch
+    for d in json_output/*/; do
+        python json_to_viewer.py --input "$d" --output viewers/
+    done
+
+Building dir must contain:
+    horizontal_graph.json
+    vertical_graph.json
+    area_ratios.json
+    metadata.json
+
+Output:
+    <building_id>_viewer.html   — self-contained, no server needed
+"""
+
+import argparse
+import json
+import math
+import re
+import sys
+from collections import defaultdict
+from pathlib import Path
+
+
+# ── Constants ─────────────────────────────────────────────────────────────────
+FL_ORDER_ALL = ["B3","B2","B1","1","2","3","4","5","6","7","8","9","10","11","12"]
+
+CLS_COLOR = {
+    1:"#3A8DDD",2:"#888780",3:"#DD6622",4:"#AA8833",5:"#8888AA",
+    6:"#9966CC",7:"#CC4499",8:"#EE2222",9:"#EE2222",10:"#BB3388",
+    11:"#AA5522",12:"#9966AA",13:"#8B7014",14:"#888780",15:"#9966AA",
+    16:"#1D9E75",17:"#1D9E75",18:"#888780",19:"#9966AA",
+    20:"#CC4499",21:"#CC4499",22:"#CC4499",
+    23:"#888888",24:"#66AACC",25:"#88AACC",
+}
+CLS_LABEL_EN = {
+    1:"Leasable Unit",2:"Main Road",3:"Corridor",4:"Vestibule",
+    5:"Water Tank",6:"Hall/Lobby",7:"MEP Room",8:"Elevator",
+    9:"Staircase",10:"Restroom",11:"Management",12:"Storage",
+    13:"Terrace",14:"Secondary Road",15:"Parking Entrance",
+    16:"Open Space",17:"Green Space",18:"Surrounding Mass",
+    19:"Parking Lot",20:"Mechanical Room",21:"Disaster Prev.",22:"Electrical",
+    23:"PIT",24:"Sunken Court",25:"Dry Area",
+}
+EXT_CLS = {2,14,16,17,18}
+CORE_CLS = {8,9}
+
+SLAB_W = {2:28,14:20,16:25,17:25,18:58}
+LAYER_ORD = {16:0,17:0,2:1,14:1,18:2}
+MASS_FACE = {1:"S",2:"W",3:"N",4:"E"}
+ROAD_FACE = {"메인도로":"E","메인 도로":"E","부도로":"N","주차장 진입로":"E","지하주차장 진입로":"E"}
+
+
+# ── Union-Find ────────────────────────────────────────────────────────────────
+class UF:
+    def __init__(self): self.p={}
+    def find(self,x):
+        self.p.setdefault(x,x)
+        if self.p[x]!=x: self.p[x]=self.find(self.p[x])
+        return self.p[x]
+    def union(self,a,b): self.p[self.find(a)]=self.find(b)
+
+
+# ── Helpers ───────────────────────────────────────────────────────────────────
+def fl_idx(raw):
+    try: return FL_ORDER_ALL.index(raw)
+    except: return 99
+
+def norm_key(s):
+    return re.sub(r'[\s_.]','',s)
+
+def _face_single_floor(fl_data, pos_map):
+    """3-step face for one floor. Returns {node_id: face}."""
+    edges = [(e["source"],e["target"],e["weight"]) for e in fl_data["edges"]]
+    ext_nodes = {n["id"]:n for n in fl_data["nodes"] if n["is_external_context"]}
+    if not ext_nodes:
+        return {}
+
+    def face_of(x,z):
+        if abs(z)>abs(x): return "N" if z>0 else "S"
+        return "E" if x>0 else "W"
+
+    result = {}
+    # Step 1: name pattern
+    for nid,n in ext_nodes.items():
+        name = n["class_name"]; num = n["instance_index"]
+        for road,f in ROAD_FACE.items():
+            if road in name: result[nid]=f; break
+        if nid not in result and "주변매스" in name:
+            result[nid] = MASS_FACE.get(num,"N")
+    # Step 2: ext-ext propagation
+    for _ in range(3):
+        for s,t,w in edges:
+            for src,tgt in [(s,t),(t,s)]:
+                if src in result and tgt in ext_nodes and tgt not in result:
+                    result[tgt] = result[src]
+    # Step 3: connected internal node position
+    for nid in list(ext_nodes):
+        if nid in result: continue
+        conn=[]
+        for s,t,w in edges:
+            other=t if s==nid else (s if t==nid else None)
+            if other and other in pos_map:
+                nd=[x for x in fl_data["nodes"] if x["id"]==other]
+                if nd and not nd[0]["is_external_context"]:
+                    conn.append(pos_map[other])
+        if conn:
+            ax=sum(p[0] for p in conn)/len(conn)
+            az=sum(p[1] for p in conn)/len(conn)
+            result[nid]=face_of(-ax,-az)
+        else:
+            n=ext_nodes[nid]; name=n["class_name"]; num=n["instance_index"]
+            if "공지" in name: result[nid]={1:"S",2:"W",3:"N",4:"E"}.get(num,"N")
+            else: result[nid]="N"
+    return result
+
+
+def compute_faces(h, floor_layouts):
+    """
+    Per-floor face assignment with 1F anchor.
+    - 1F (or lowest ground) computed first as anchor
+    - Upper floors: same node ID reuses anchor face
+    - New nodes appearing in upper floors: computed from that floor
+    """
+    ground_fl = next((f for f in h if f["floor_label"] in ["1","B1"]), h[0])
+    pos_ref   = floor_layouts.get(ground_fl["floor_label"], {})
+    anchor    = _face_single_floor(ground_fl, pos_ref)
+
+    global_face = dict(anchor)
+    for fl_data in h:
+        if fl_data["floor_label"] == ground_fl["floor_label"]:
+            continue
+        ext_ids = {n["id"] for n in fl_data["nodes"] if n["is_external_context"]}
+        new_ids = ext_ids - set(global_face.keys())
+        if new_ids:
+            pos_map  = floor_layouts.get(fl_data["floor_label"], {})
+            fl_result = _face_single_floor(fl_data, pos_map)
+            for nid in new_ids:
+                global_face[nid] = fl_result.get(nid, "N")
+    return global_face
+
+
+def compute_layouts(h, v):
+    """Spring layout per floor with fixed vertical shafts."""
+    try:
+        import networkx as nx
+    except ImportError:
+        print("  ⚠️  networkx not found — using circular fallback layout")
+        layouts = {}
+        for fl in h:
+            raw = fl["floor_label"]
+            int_nodes = [n for n in fl["nodes"] if not n["is_external_context"]]
+            N = len(int_nodes)
+            layouts[raw] = {}
+            for i,n in enumerate(int_nodes):
+                a = 2*math.pi*i/max(N,1)
+                r = 40
+                if n["class_id"]==1: layouts[raw][n["id"]]=(0,0)
+                else: layouts[raw][n["id"]]=(round(math.cos(a)*r,1),round(math.sin(a)*r,1))
+        return layouts, {}
+
+    # Union-Find clusters
+    uf = UF()
+    node_cls = {}
+    for fl in h:
+        for n in fl["nodes"]: node_cls[n["id"]] = n["class_id"]
+    for e in v["edges"]:
+        if float(e["weight"])>0: uf.union(e["source_node"],e["target_node"])
+
+    clusters = defaultdict(list)
+    for nid in uf.p: clusters[uf.find(nid)].append(nid)
+
+    # Fixed XZ per cluster
+    fixed_xz = {}
+    ev_i=st_i=mep_i=wc_i=0
+    for rep,members in sorted(clusters.items(),key=lambda x:-len(x[1])):
+        if len(members)<2 or any(m in fixed_xz for m in members): continue
+        cc = defaultdict(int)
+        for m in members: cc[node_cls.get(m,0)]+=1
+        mc = max(cc,key=cc.get)
+        if mc==8:   x,z=-30+ev_i*14,16; ev_i+=1
+        elif mc==9:
+            angles=[0.5,1.5,2.5]; a=angles[st_i%3]*math.pi/2
+            x,z=round(math.cos(a)*34),round(math.sin(a)*34); st_i+=1
+        elif mc==7:
+            a=([0.85,1.75][mep_i%2])*math.pi/2+0.2
+            x,z=round(math.cos(a)*52),round(math.sin(a)*52); mep_i+=1
+        elif mc==10:
+            a=([0.15,0.75][wc_i%2])*math.pi/2
+            x,z=round(math.cos(a)*46),round(math.sin(a)*46); wc_i+=1
+        else: continue
+        for m in members: fixed_xz[m]=(x,z)
+
+    for fl in h:
+        for n in fl["nodes"]:
+            if n["class_id"]==1 and not n["is_external_context"]:
+                fixed_xz[n["id"]]=(0,0)
+
+    SCALE=72; BOUND=0.85
+    floor_layouts={}
+    for fl_data in h:
+        raw = fl_data["floor_label"]
+        int_nodes = [n for n in fl_data["nodes"] if not n["is_external_context"]]
+        if not int_nodes: continue
+        node_ids = [n["id"] for n in int_nodes]
+        G = nx.Graph(); G.add_nodes_from(node_ids)
+        for e in fl_data["edges"]:
+            s,t,w = e["source"],e["target"],e["weight"]
+            if s in node_ids and t in node_ids:
+                G.add_edge(s,t,weight=max(float(w),0.1))
+        init_pos,fixed_list={},[]
+        for nid in node_ids:
+            if nid in fixed_xz:
+                fx,fz=fixed_xz[nid]
+                init_pos[nid]=(fx/SCALE*BOUND,fz/SCALE*BOUND)
+                fixed_list.append(nid)
+        try:
+            pos = nx.spring_layout(G,pos=init_pos or None,
+                                   fixed=fixed_list or None,
+                                   weight="weight",k=0.35,iterations=120,seed=42)
+        except:
+            pos = {nid:(0,0) for nid in node_ids}
+        floor_layouts[raw]={
+            nid:(round(max(-BOUND,min(BOUND,px))*SCALE,1),
+                 round(max(-BOUND,min(BOUND,pz))*SCALE,1))
+            for nid,(px,pz) in pos.items()}
+    return floor_layouts, fixed_xz
+
+
+def compute_core_segs(h, v, floor_layouts):
+    """Union-Find cluster → continuous core box segments."""
+    uf = UF()
+    node_cls = {}
+    for fl in h:
+        for n in fl["nodes"]: node_cls[n["id"]] = n["class_id"]
+    for e in v["edges"]:
+        if float(e["weight"])>0: uf.union(e["source_node"],e["target_node"])
+
+    clusters = defaultdict(list)
+    for nid in uf.p: clusters[uf.find(nid)].append(nid)
+
+    node_floors = defaultdict(set)
+    for fl in h:
+        for n in fl["nodes"]:
+            if not n["is_external_context"]: node_floors[n["id"]].add(fl["floor_label"])
+
+    all_raws = [fl["floor_label"] for fl in h]
+
+    segs = []
+    for rep,members in sorted(clusters.items(),key=lambda x:-len(x[1])):
+        if len(members)<2: continue
+        cc=defaultdict(int)
+        for m in members: cc[node_cls.get(m,0)]+=1
+        mc=max(cc,key=cc.get)
+        if mc not in [8,9]: continue
+
+        all_fls=set()
+        for m in members: all_fls.update(node_floors.get(m,set()))
+        sorted_idx=[all_raws.index(f) for f in all_raws if f in all_fls]
+        if not sorted_idx: continue
+
+        # contiguous segments
+        seg_list=[]; seg=[sorted_idx[0]]
+        for i in range(1,len(sorted_idx)):
+            if sorted_idx[i]==sorted_idx[i-1]+1: seg.append(sorted_idx[i])
+            else: seg_list.append(seg); seg=[sorted_idx[i]]
+        seg_list.append(seg)
+
+        # average XZ
+        pts=[]
+        for m in members:
+            for raw in all_raws:
+                if raw in node_floors[m]:
+                    p=floor_layouts.get(raw,{}).get(m)
+                    if p: pts.append(p); break
+        if not pts: continue
+        ax=sum(p[0] for p in pts)/len(pts)
+        az=sum(p[1] for p in pts)/len(pts)
+
+        for seg in seg_list:
+            segs.append({
+                "cls":mc,
+                "from":all_raws[seg[0]],
+                "to":all_raws[seg[-1]],
+                "x":round(ax,1),"z":round(az,1),
+                "bw":0.064 if mc==8 else 0.076,"bd":0.064,
+                "label":("EV" if mc==8 else "Stair")+f" {all_raws[seg[0]]}F~{all_raws[seg[-1]]}F"
+            })
+    return segs
+
+
+def compute_vmep(v):
+    """Non-core mandatory vertical edges (w>0)."""
+    result=[]; seen=set()
+    for e in v["edges"]:
+        if not e["is_mandatory_continuity"]: continue
+        sc=e.get("source_class_id",0)
+        if sc in [8,9]: continue
+        key=tuple(sorted([e["source_node"],e["target_node"]]))
+        if key in seen: continue
+        seen.add(key)
+        result.append([e["source_floor"],e["source_node"],e["target_node"]])
+    return result
+
+
+def compute_vmep_cluster(v):
+    """Programmatic cluster vertical edges (w=0) — architect intent."""
+    result=[]; seen=set()
+    for e in v["edges"]:
+        if float(e["weight"]) != 0: continue
+        key=tuple(sorted([e["source_node"],e["target_node"]]))
+        if key in seen: continue
+        seen.add(key)
+        result.append([e["source_floor"],e["source_node"],e["target_node"]])
+    return result
+
+
+def compute_vert_cont(h, v):
+    """
+    Union-Find: node → (count, kind)
+    kind = 'physical'  (w>0, mandatory shaft)
+         = 'cluster'   (w=0, programmatic grouping by architect)
+    Returns two dicts: vc_physical, vc_cluster
+    """
+    uf_phys = UF()   # w>0: physical connection
+    uf_clus = UF()   # w=0: programmatic cluster
+
+    for e in v["edges"]:
+        w = float(e["weight"])
+        if w > 0:
+            uf_phys.union(e["source_node"], e["target_node"])
+            uf_clus.union(e["source_node"], e["target_node"])
+        else:
+            uf_clus.union(e["source_node"], e["target_node"])
+
+    node_floors = defaultdict(set)
+    for fl in h:
+        for n in fl["nodes"]:
+            if not n["is_external_context"]:
+                node_floors[n["id"]].add(fl["floor_label"])
+
+    def build_vc(uf):
+        clusters = defaultdict(list)
+        for nid in uf.p: clusters[uf.find(nid)].append(nid)
+        vc = {}
+        for rep, members in clusters.items():
+            if len(members) < 2: continue
+            all_fls = set()
+            for m in members: all_fls.update(node_floors.get(m, set()))
+            cnt = len(all_fls)
+            if cnt > 1:
+                for m in members: vc[m] = cnt
+        return vc
+
+    vc_physical = build_vc(uf_phys)
+    vc_cluster  = {k: v for k, v in build_vc(uf_clus).items()
+                   if k not in vc_physical}
+    return vc_physical, vc_cluster
+
+
+def build_area_lookup(a):
+    lu={}
+    for flkey,fdata in a["floors"].items():
+        raw=fdata["floor_label"]
+        for k,v in fdata["spaces"].items():
+            lu[raw+"::"+norm_key(k)]=v
+    return lu
+
+
+def build_floors_js(h, a, floor_layouts, EXT_FACE, EXT_OFF):
+    """Build JS-ready floor data array."""
+    area_lu=build_area_lookup(a)
+    floors_js=[]
+    fl_all=[f["floor_label"] for f in h]   # 이 건물의 실제 층 목록
+
+    for fl_data in h:
+        raw=fl_data["floor_label"]
+        layout=floor_layouts.get(raw,{})
+
+        seen_ext=set()
+        nodes_js=[]
+
+        # Per-floor EXT_OFF
+        fg=defaultdict(list)
+        for n in fl_data["nodes"]:
+            if n["is_external_context"]:
+                face2=EXT_FACE.get(n["id"],"N")
+                fg[face2].append((LAYER_ORD.get(n["class_id"],0),n["class_id"],n["instance_index"],n["id"]))
+        fl_off={}
+        for face2,items in fg.items():
+            items.sort(); off=72
+            for _,cls,_n,nid in items:
+                w=SLAB_W.get(cls,25); off+=w/2; fl_off[nid]=round(off,1); off+=w/2
+
+        for n in fl_data["nodes"]:
+            nid=n["id"]; cls=n["class_id"]
+            nd={
+                "i":nid,"c":cls,"e":n["class_name_en"].split("/")[0].strip(),
+                "n":n["instance_index"],"cr":1 if n["is_vertical_core"] else 0
+            }
+            if n["is_external_context"]:
+                face2=EXT_FACE.get(nid,"N")
+                key=(face2,cls,n["instance_index"])
+                if key in seen_ext: continue
+                seen_ext.add(key)
+                nd["ext"]=1
+                nd["face"]=face2
+                nd["off"]=fl_off.get(nid,97)
+                nd["viewOnly"]=0 if fl_all.index(raw)<=2 else 1
+                if cls==18: nd["mass"]=1
+            else:
+                p=layout.get(nid,(0,0))
+                nd["ext"]=0
+                nd["x"]=p[0]; nd["z"]=p[1]
+                ak=raw+"::"+norm_key(nid)
+                ar_data=area_lu.get(ak,{})
+                nd["ar"]=round(ar_data.get("area_ratio",0.02),4)
+                nd["asm"]=round(ar_data.get("area_sqm",0),1)
+            nodes_js.append(nd)
+
+        # Dedup edges
+        eseen={}
+        for e in fl_data["edges"]:
+            k=tuple(sorted([e["source"],e["target"]]))
+            w=float(e["weight"])
+            if k not in eseen or w>eseen[k][2]: eseen[k]=[e["source"],e["target"],round(w,2)]
+
+        floors_js.append({
+            "l":fl_data.get("floor_label",raw),
+            "raw":raw,
+            "n":nodes_js,
+            "e":list(eseen.values())
+        })
+    return floors_js
+
+
+def build_stats(h, a, m):
+    """Build overview stats for each floor."""
+    area_lu=build_area_lookup(a)
+    stats=[]
+    cls_global=defaultdict(float)
+
+    for fl_data in h:
+        raw=fl_data["floor_label"]
+        int_nodes=[n for n in fl_data["nodes"] if not n["is_external_context"]]
+        ext_nodes=[n for n in fl_data["nodes"] if n["is_external_context"]]
+
+        by_cls=defaultdict(float)
+        total_area=0
+        for n in int_nodes:
+            ak=raw+"::"+norm_key(n["id"])
+            ar=area_lu.get(ak,{}).get("area_sqm",0)
+            by_cls[n["class_id"]]+=ar
+            total_area+=ar
+            cls_global[n["class_id"]]+=ar
+
+        stats.append({
+            "floor":raw,
+            "label":fl_data.get("floor_label",raw),
+            "total_area":round(total_area,1),
+            "num_int_nodes":len(int_nodes),
+            "num_ext_nodes":len(ext_nodes),
+            "num_edges":len(fl_data["edges"]),
+            "strong_edges":sum(1 for e in fl_data["edges"] if float(e["weight"])>=0.9),
+            "by_cls":{str(k):round(v,1) for k,v in by_cls.items() if v>0},
+        })
+    return stats, cls_global
+
+
+# ── HTML template ─────────────────────────────────────────────────────────────
+HTML_TEMPLATE = """<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ATLAS — __TITLE__</title>
+<style>
+*{{box-sizing:border-box;margin:0;padding:0}}
+body{{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#F7F8FA;color:#222;font-size:13px}}
+.header{{background:#1a1a2e;color:#fff;padding:14px 24px;display:flex;align-items:center;gap:16px}}
+.header h1{{font-size:16px;font-weight:700;letter-spacing:.3px}}
+.header .meta{{font-size:11px;opacity:.65;margin-left:auto;line-height:1.7}}
+.tabs{{display:flex;gap:0;background:#fff;border-bottom:2px solid #e8eaf0;padding:0 20px}}
+.tab{{padding:10px 20px;cursor:pointer;font-size:13px;font-weight:500;color:#666;border-bottom:2.5px solid transparent;margin-bottom:-2px;transition:all .15s}}
+.tab.active{{color:#1a7fe8;border-color:#1a7fe8}}
+.tab:hover{{color:#333}}
+.panel{{display:none;padding:20px}}
+.panel.active{{display:block}}
+
+/* Overview */
+.ov-grid{{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}}
+@media(max-width:700px){{.ov-grid{{grid-template-columns:1fr}}}}
+.card{{background:#fff;border-radius:10px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.08)}}
+.card h3{{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:#888;margin-bottom:10px}}
+.floor-table{{width:100%;border-collapse:collapse;font-size:12px}}
+.floor-table th{{background:#f4f5f8;text-align:left;padding:6px 8px;color:#555;font-weight:600;font-size:11px}}
+.floor-table td{{padding:5px 8px;border-bottom:1px solid #f0f0f0}}
+.floor-table tr:last-child td{{border:none}}
+.bar-wrap{{display:flex;align-items:center;gap:6px}}
+.bar{{height:10px;border-radius:3px;min-width:2px}}
+.cls-legend{{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}}
+.cls-item{{display:flex;align-items:center;gap:4px;font-size:11px}}
+.cls-dot{{width:10px;height:10px;border-radius:50%}}
+
+/* 2D */
+#d2-controls{{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;align-items:center}}
+.ftab{{font-size:11px;padding:3px 10px;border-radius:9px;border:1px solid #ddd;background:#fff;color:#555;cursor:pointer;transition:all .12s}}
+.ftab.active{{background:#1a7fe8;color:#fff;border-color:transparent;font-weight:600}}
+.fbtn{{font-size:10px;padding:2px 8px;border-radius:7px;border:1.5px solid transparent;background:#f0f1f5;color:#555;cursor:pointer}}
+.fbtn.on{{border-color:currentColor;font-weight:600}}
+#d2-stat{{font-size:11px;color:#666;padding:4px 10px;background:#f4f5f8;border-radius:6px;margin-bottom:6px}}
+#d2-svg{{width:100%;height:500px;border-radius:10px;background:#fff;border:1px solid #e8eaf0}}
+#d2-info{{font-size:12px;color:#555;padding:4px 10px;background:#f4f5f8;border-radius:6px;margin-top:5px;min-height:22px}}
+
+/* 3D */
+#d3-controls{{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:6px;align-items:center}}
+.cbtn{{font-size:11px;padding:3px 8px;border-radius:9px;border:1px solid #ddd;background:#fff;color:#555;cursor:pointer}}
+.cbtn.on{{background:#1a7fe8;color:#fff;border-color:transparent}}
+.cbtn.paper{{background:#5544AA;color:#fff;border-color:transparent;font-weight:bold}}
+#fi-row{{display:flex;gap:3px;flex-wrap:wrap;margin-bottom:5px;align-items:center;font-size:10px;color:#888}}
+.fib{{font-size:10px;padding:2px 7px;border-radius:7px;border:1px solid #ddd;background:#f4f5f8;color:#666;cursor:pointer}}
+.fib.active{{background:#FF7700;color:#fff;border-color:transparent}}
+#d3-canvas{{width:100%;height:560px;border-radius:10px;cursor:grab;display:block}}
+#d3-canvas.pan{{cursor:move}}
+#d3-info{{font-size:12px;color:#555;padding:4px 10px;background:#f4f5f8;border-radius:6px;margin-top:5px;min-height:22px}}
+.hint{{font-size:10px;color:#aaa;margin-left:4px}}
+.sep{{width:1px;height:16px;background:#e0e0e0;margin:0 2px}}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+</head>
+<body>
+<div class="header">
+  <div>
+    <div style="font-size:10px;opacity:.5;letter-spacing:1px;text-transform:uppercase;margin-bottom:2px">ATLAS Dataset Viewer</div>
+    <h1>__TITLE__</h1>
+  </div>
+  <div class="meta">
+    __NUM_FLOORS__ floors &nbsp;·&nbsp; __TOTAL_NODES__ nodes &nbsp;·&nbsp; __TOTAL_HEDGES__ h-edges &nbsp;·&nbsp; __TOTAL_VEDGES__ v-edges
+  </div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('overview',this)">📊 Overview</div>
+  <div class="tab" onclick="switchTab('d2',this)">🔵 2D Graph</div>
+  <div class="tab" onclick="switchTab('d3',this)">📐 3D View</div>
+</div>
+
+<!-- ── Overview ─────────────────────────────────────────── -->
+<div id="tab-overview" class="panel active">
+  <div class="ov-grid">
+    <div class="card">
+      <h3>Floor Summary</h3>
+      <table class="floor-table">
+        <thead><tr><th>Floor</th><th>Area(㎡)</th><th>Int.Nodes</th><th>Edges</th><th>Strong(w=1)</th></tr></thead>
+        <tbody id="floor-tbody"></tbody>
+      </table>
+    </div>
+    <div class="card">
+      <h3>Space Class Distribution</h3>
+      <div id="cls-bars"></div>
+      <div class="cls-legend" id="cls-legend"></div>
+    </div>
+  </div>
+  <div class="card">
+    <h3>Vertical Core Continuity</h3>
+    <div id="vert-info" style="font-size:12px;color:#555;line-height:1.8"></div>
+  </div>
+</div>
+
+<!-- ── 2D Graph ──────────────────────────────────────────── -->
+<div id="tab-d2" class="panel">
+  <div id="d2-controls">
+    <div id="d2-tabs" style="display:flex;gap:3px;flex-wrap:wrap"></div>
+    <div class="sep"></div>
+    <span style="font-size:10px;color:#aaa">Filter:</span>
+    <button class="fbtn on" style="color:#3A8DDD" id="f-leasable" onclick="tF('leasable')">Leasable</button>
+    <button class="fbtn on" style="color:#EE2222" id="f-core"     onclick="tF('core')">Core</button>
+    <button class="fbtn on" style="color:#BB3388" id="f-mep"      onclick="tF('mep')">WC/MEP</button>
+    <button class="fbtn on" style="color:#DD6622" id="f-circ"     onclick="tF('circ')">Circ.</button>
+    <button class="fbtn on" style="color:#8B7014" id="f-terrace"  onclick="tF('terrace')">Terrace</button>
+    <button class="fbtn on" style="color:#9966AA" id="f-storage"  onclick="tF('storage')">Storage</button>
+    <button class="fbtn on" style="color:#1D9E75" id="f-ext"      onclick="tF('ext')">Open Sp.</button>
+    <button class="fbtn on" style="color:#888780" id="f-mass"     onclick="tF('mass')">Road/Mass</button>
+    <button class="fbtn" style="color:#666;margin-left:4px" onclick="rF()">All</button>
+  </div>
+  <div id="d2-stat">—</div>
+  <svg id="d2-svg"></svg>
+  <div id="d2-info">Click node for details · Orange dashed ring = vertical continuity · N/S/E/W compass layout</div>
+</div>
+
+<!-- ── 3D View ──────────────────────────────────────────── -->
+<div id="tab-d3" class="panel">
+  <div id="d3-controls">
+    <button class="cbtn on" id="b-ext"  onclick="tog3('ext')">External</button>
+    <button class="cbtn on" id="b-cor"  onclick="tog3('cor')">Core</button>
+    <button class="cbtn on" id="b-slab" onclick="tog3('slab')">Slabs</button>
+    <button class="cbtn on" id="b-he"   onclick="tog3('he')">H-edges</button>
+    <button class="cbtn on" id="b-ve"   onclick="tog3('ve')">V-edges</button>
+    <button class="cbtn on" id="b-ce"   onclick="tog3('ce')">Ctx.edges</button>
+    <button class="cbtn on" id="b-lbl"  onclick="tog3('lbl')">Labels</button>
+    <div class="sep"></div>
+    <button class="cbtn paper" onclick="setPV()">📐 Paper View</button>
+    <button class="cbtn" onclick="rst3()">Reset</button>
+    <span class="hint">Drag:rotate · Alt+drag:pan · Scroll:zoom · Click:info</span>
+  </div>
+  <div id="fi-row">
+    <span>Floor isolate:</span>
+    <button class="fib active" id="fi-all" onclick="iso3('all')">All</button>
+  </div>
+  <canvas id="d3-canvas"></canvas>
+  <div id="d3-info">Click node for details · 📐 locks to paper figure angle</div>
+</div>
+
+<script>
+// ── Embedded data ──────────────────────────────────────────────
+const METADATA   = __METADATA_JSON__;
+const FLOORS     = __FLOORS_JSON__;
+const CORE_SEGS  = __CORE_SEGS_JSON__;
+const VMEP         = __VMEP_JSON__;
+const VMEP_CLUSTER = __VMEP_CLUSTER_JSON__;  // w=0 programmatic cluster edges
+const VERT_CONT  = __VERT_CONT_JSON__;
+const VC_CLUSTER = __VC_CLUSTER_JSON__;  // w=0 programmatic cluster
+const STATS      = __STATS_JSON__;
+const CLS_GLOBAL = __CLS_GLOBAL_JSON__;
+const CLS_COLOR  = __CLS_COLOR_JSON__;
+const CLS_LABEL  = __CLS_LABEL_JSON__;
+
+// ── Tab switching ──────────────────────────────────────────────
+function switchTab(id,el){{
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  el.classList.add('active');
+  if(id==='d2'&&!d2_init)initD2();
+  if(id==='d3'&&!d3_init)initD3();
+}}
+
+// ═══════════════════════════════════════════════════════════════
+// ── OVERVIEW ───────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded',function(){{
+  // Floor table
+  const tb=document.getElementById('floor-tbody');
+  STATS.forEach(s=>{{
+    const tr=document.createElement('tr');
+    const lbl=METADATA.floor_labels.includes(s.floor)?s.floor:s.label;
+    tr.innerHTML=`<td><b>${{lbl}}</b></td><td>${{s.total_area}}</td>`+
+      `<td>${{s.num_int_nodes}}</td><td>${{s.num_edges}}</td>`+
+      `<td>${{s.strong_edges}}</td>`;
+    tb.appendChild(tr);
+  }});
+
+  // Class distribution bars
+  const total=Object.values(CLS_GLOBAL).reduce((a,b)=>a+b,0)||1;
+  const sorted=Object.entries(CLS_GLOBAL).sort((a,b)=>b[1]-a[1]);
+  const barsEl=document.getElementById('cls-bars');
+  const legEl=document.getElementById('cls-legend');
+  sorted.slice(0,10).forEach(([cls,area])=>{{
+    const pct=(area/total*100).toFixed(1);
+    const w=Math.max(2,(area/total*100));
+    const col=CLS_COLOR[cls]||'#888';
+    const lbl=CLS_LABEL[cls]||'cls'+cls;
+    const div=document.createElement('div');
+    div.style.cssText='display:flex;align-items:center;gap:6px;margin-bottom:4px;font-size:11px';
+    div.innerHTML=`<span style="width:80px;text-align:right;color:#666">${{lbl}}</span>`+
+      `<div style="flex:1;background:#f0f1f5;border-radius:3px;height:12px">`+
+      `<div style="width:${{w}}%;background:${{col}};height:100%;border-radius:3px"></div></div>`+
+      `<span style="width:42px;color:#555">${{area.toFixed(0)}}㎡</span>`+
+      `<span style="width:36px;color:#aaa">${{pct}}%</span>`;
+    barsEl.appendChild(div);
+    const li=document.createElement('div');li.className='cls-item';
+    li.innerHTML=`<div class="cls-dot" style="background:${{col}}"></div>${{lbl}}`;
+    legEl.appendChild(li);
+  }});
+
+  // Vertical continuity
+  const vc=document.getElementById('vert-info');
+  const byFloors={{}};
+  Object.entries(VERT_CONT).forEach(([nid,cnt])=>{{
+    if(!byFloors[cnt])byFloors[cnt]=[];
+    byFloors[cnt].push(nid);
+  }});
+  const lines=Object.entries(byFloors).sort((a,b)=>b[0]-a[0]).map(([cnt,nids])=>{{
+    const sample=nids.slice(0,3).join(', ')+(nids.length>3?` …(+${{nids.length-3}})`:'');
+    return `<span style="display:inline-block;background:#fff4e6;border:1px solid #ffb74d;border-radius:5px;padding:2px 8px;margin:2px;font-size:11px">🔴 ↕ ${{cnt}}F · ${{sample}}</span>`;
+  }});
+  // Programmatic clusters (w=0)
+  const byFloorsCl={{}};
+  Object.entries(VC_CLUSTER).forEach(([nid,cnt])=>{{
+    if(!byFloorsCl[cnt])byFloorsCl[cnt]=[];
+    byFloorsCl[cnt].push(nid);
+  }});
+  const linesCl=Object.entries(byFloorsCl).sort((a,b)=>b[0]-a[0]).map(([cnt,nids])=>{{
+    const sample=nids.slice(0,3).join(', ')+(nids.length>3?` …(+${{nids.length-3}})`:'');
+    return `<span style="display:inline-block;background:#e8f0ff;border:1px solid #90b4e8;border-radius:5px;padding:2px 8px;margin:2px;font-size:11px">🔵 cluster ↕ ${{cnt}}F · ${{sample}}</span>`;
+  }});
+  vc.innerHTML=(lines.join('') + linesCl.join('')) || '<span style="color:#aaa">No vertical continuity detected</span>';
+}});
+
+// ═══════════════════════════════════════════════════════════════
+// ── 2D GRAPH ───────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+let d2_init=false, d2_sim=null, d2_nS=null, d2_eS=null, d2_rS=null;
+const FD={{leasable:true,core:true,mep:true,circ:true,terrace:true,storage:true,ext:true,mass:true}};
+
+function fG(n){{
+  if(n.ext)return(n.c===18||n.c===2||n.c===14)?'mass':'ext';
+  if(n.c===1)return'leasable';if(n.c===8||n.c===9)return'core';
+  if(n.c===7||n.c===10)return'mep';if([3,4,5,6].includes(n.c))return'circ';
+  if(n.c===13)return'terrace';if([11,12,15,19].includes(n.c))return'storage';
+  return'circ';}}
+function tF(k){{FD[k]=!FD[k];document.getElementById('f-'+k).classList.toggle('on',FD[k]);applyF();}}
+function rF(){{Object.keys(FD).forEach(k=>FD[k]=true);document.querySelectorAll('.fbtn').forEach(b=>{{if(b.id.startsWith('f-'))b.classList.add('on');}});applyF();}}
+function applyF(){{if(!d2_nS)return;d2_nS.attr('display',d=>FD[fG(d)]?null:'none');d2_eS.attr('display',d=>FD[fG(d.source)]&&FD[fG(d.target)]?null:'none');d2_rS&&d2_rS.attr('display',d=>FD[fG(d)]?null:'none');}}
+
+function nColor2(c,ext){{if(ext)return(c===18||c===2||c===14)?'#888780':'#1D9E75';return CLS_COLOR[c]||'#888';}}
+function nR2(ar,ext){{return ext?14:Math.max(13,Math.min(46,Math.sqrt(ar||.005)*72));}}
+function shortLbl(id){{
+  const m={{'임대':'Leas','테라스':'Terr','계단실':'Stai','화장실':'WC','설비':'MEP',
+    '복도':'Corr','창고':'Stor','관리실':'Mgmt','방풍실':'Wind','주차장':'Park',
+    '공지':'OpSp','메인도로':'Road','주변매스':'Mass','E.V':'EV','부도로':'Sec',
+    'Leasable':'Leas','Staircase':'Stai','Elevator':'EV','Restroom':'WC',
+    'Corridor':'Corr','Storage':'Stor','Terrace':'Terr','MEP':'MEP'}};
+  let s=id;
+  for(const[k,v] of Object.entries(m)){{if(s.startsWith(k)){{s=v+(s.replace(k,'').replace(/^_/,''));break;}}}}
+  return s.slice(0,7);}}
+
+function faceXY2(f,idx,total,W,H){{
+  // sc 동적 조정: 노드 수가 많을수록 간격 축소
+  const maxW=(f==='N'||f==='S')?(W-108):(H-108);
+  const minSc=32, maxSc=68;
+  const sc=total<=1?maxSc:Math.max(minSc,Math.min(maxSc,Math.floor(maxW/(total-1))));
+  const pad=Math.max(40,54-Math.max(0,total-4)*3);
+  const off=(idx-(total-1)/2)*sc;
+  if(f==='N')return{{fx:W/2+off,fy:pad}};if(f==='S')return{{fx:W/2+off,fy:H-pad}};
+  if(f==='E')return{{fx:W-pad,fy:H/2+off}};if(f==='W')return{{fx:pad,fy:H/2+off}};
+  return null;}}
+
+function buildD2Stats(fl){{
+  const int=fl.n.filter(n=>!n.ext);
+  const sum=ns=>ns.reduce((a,n)=>a+(n.asm||0),0);
+  const tot=fl.area||sum(int)||1;
+  const pct=ns=>((sum(ns)/tot)*100).toFixed(0)+'%';
+  const L=int.filter(n=>n.c===1),K=int.filter(n=>n.cr),S=int.filter(n=>!n.cr&&[7,10].includes(n.c)),T=int.filter(n=>n.c===13);
+  const se=fl.e.filter(e=>e[2]>=.9).length,ext=fl.n.filter(n=>n.ext).length;
+  const vc=int.filter(n=>VERT_CONT[n.i]&&VERT_CONT[n.i]>1).length;
+  return `<b>${{fl.l}}</b> · ${{tot.toFixed?tot.toFixed(0):tot}}㎡ GFA &nbsp;·&nbsp; `+
+    `<span style="color:#3A8DDD">Leas ${{sum(L).toFixed(0)}}㎡ (${{pct(L)}})</span> &nbsp;`+
+    `<span style="color:#EE2222">Core ${{sum(K).toFixed(0)}}㎡</span> &nbsp;`+
+    `<span style="color:#BB3388">WC ${{sum(S).toFixed(0)}}㎡</span>`+
+    (sum(T)>0?` &nbsp;<span style="color:#8B7014">Terr ${{sum(T).toFixed(0)}}㎡</span>`:'')+
+    ` &nbsp;·&nbsp; ${{se}} strong edges &nbsp;·&nbsp; ${{ext}} ext &nbsp;·&nbsp; `+
+    `<span style="color:#FF8C00">↕${{vc}} vert.cont</span>`;}}
+
+function initD2(){{
+  d2_init=true;
+  // Build floor tabs
+  const tabDiv=document.getElementById('d2-tabs');
+  FLOORS.forEach((fl,i)=>{{
+    const b=document.createElement('button');
+    b.className='ftab'+(i===0?' active':'');
+    b.textContent=fl.l;
+    b.onclick=()=>{{document.querySelectorAll('.ftab').forEach(x=>x.classList.remove('active'));b.classList.add('active');drawD2(fl);}};
+    tabDiv.appendChild(b);
+  }});
+  drawD2(FLOORS[0]);
+}}
+
+function drawD2(fl){{
+  if(d2_sim)d2_sim.stop();
+  const svgEl=document.getElementById('d2-svg');
+  const W=svgEl.clientWidth||660,H=500;
+  svgEl.setAttribute('viewBox',`0 0 ${{W}} ${{H}}`);
+  document.getElementById('d2-stat').innerHTML=buildD2Stats(fl);
+
+  // Use D3 if available, else draw simple SVG
+  if(typeof d3==='undefined'){{drawD2Simple(fl,svgEl,W,H);return;}}
+
+  const svg=d3.select('#d2-svg');svg.selectAll('*').remove();
+
+  // Compass
+  svg.append('g').attr('opacity',.055).call(g=>{{
+    g.append('line').attr('x1',W/2).attr('y1',28).attr('x2',W/2).attr('y2',H-28).attr('stroke','#888').attr('stroke-width',1);
+    g.append('line').attr('x1',28).attr('y1',H/2).attr('x2',W-28).attr('y2',H/2).attr('stroke','#888').attr('stroke-width',1);
+  }});
+  [['N',W/2,14],['S',W/2,H-8],['E',W-7,H/2],['W',13,H/2]].forEach(([t,x,y])=>{{
+    svg.append('text').attr('x',x).attr('y',y).attr('text-anchor','middle').attr('dominant-baseline','middle')
+      .attr('font-size',10).attr('fill','#bbb').attr('font-weight','600').text(t);
+  }});
+
+  const nodes=fl.n.map(n=>({{...n,id:n.i}}));
+  const nodeMap=new Map(nodes.map(n=>[n.id,n]));
+  const seen=new Map();
+  fl.e.forEach(([s,t,w])=>{{const k=[s,t].sort().join('||');if(!seen.has(k)||w>seen.get(k)[2])seen.set(k,[s,t,w]);}});
+  const links=[...seen.values()].filter(([s,t])=>nodeMap.has(s)&&nodeMap.has(t)).map(([s,t,w])=>({source:s,target:t,w}));
+
+  const fg={{}};
+  nodes.forEach(n=>{{if(!n.ext)return;const f=n.face||'N';n._face=f;if(!fg[f])fg[f]=[];fg[f].push(n);}});
+  Object.entries(fg).forEach(([f,grp])=>grp.forEach((n,i)=>{{const a=faceXY2(f,i,grp.length,W,H);if(a){{n.fx=a.fx;n.fy=a.fy;}}}}));
+  nodes.filter(n=>n.c===1&&!n.ext).forEach(n=>{{n.fx=W/2;n.fy=H/2;}});
+  nodes.filter(n=>!n.ext&&n.c!==1).forEach(n=>{{if(!n.x){{n.x=W/2+(Math.random()-.5)*80;n.y=H/2+(Math.random()-.5)*80;}}}});
+
+  d2_sim=d3.forceSimulation(nodes)
+    .force('link',d3.forceLink(links).id(d=>d.id)
+      .distance(d=>{{const b=d.source.ext||d.target.ext?85:70;return d.w>=1?b*.62:d.w>=.5?b:b*1.5;}})
+      .strength(d=>d.w>=.9?1.0:d.w>=.4?0.7:0.28))
+    .force('charge',d3.forceManyBody().strength(d=>d.ext?-12:d.c===1?-50:-95))
+    .force('collide',d3.forceCollide().radius(d=>nR2(d.ar,d.ext)+5).strength(.88))
+    .force('x',d3.forceX(W/2).strength(.022)).force('y',d3.forceY(H/2).strength(.022))
+    .alphaDecay(.024).velocityDecay(.44);
+
+  const gE=svg.append('g'),gR=svg.append('g'),gN=svg.append('g');
+  const eS=gE.selectAll('line').data(links).join('line')
+    .attr('stroke',d=>d.w>=.9?'#EE2222':d.w>=.4?'#3A8DDD':'#CCCCCC')
+    .attr('stroke-width',d=>d.w>=.9?2.8:d.w>=.4?1.6:.9)
+    .attr('stroke-dasharray',d=>d.w===0?'5,3':null)
+    .attr('stroke-opacity',d=>d.w>=0.9 ? 0.80 : d.w>=0.4 ? 0.62 : 0.38).attr('stroke-linecap','round');
+  d2_eS=eS;
+
+  const vcN=nodes.filter(n=>!n.ext&&VERT_CONT[n.i]&&VERT_CONT[n.i]>1);
+  const rS=gR.selectAll('g').data(vcN).join('g');
+  rS.append('circle').attr('r',d=>nR2(d.ar,d.ext)+5.5).attr('fill','none').attr('stroke','#FF8C00').attr('stroke-width',2).attr('stroke-dasharray','3 2').attr('stroke-opacity',.72);
+  rS.append('rect').attr('x',d=>nR2(d.ar,d.ext)+2).attr('y',d=>-nR2(d.ar,d.ext)-14).attr('width',22).attr('height',13).attr('rx',4).attr('fill','#FF8C00').attr('fill-opacity',.92);
+  rS.append('text').text(d=>`↕${{VERT_CONT[d.i]}}F`).attr('x',d=>nR2(d.ar,d.ext)+13).attr('y',d=>-nR2(d.ar,d.ext)-5).attr('text-anchor','middle').attr('font-size',7.5).attr('font-weight','bold').attr('fill','white').attr('pointer-events','none');
+  d2_rS=rS;
+
+  const nS=gN.selectAll('g').data(nodes).join('g').attr('cursor','pointer')
+    .call(d3.drag()
+      .on('start',(ev,d)=>{{if(!ev.active)d2_sim.alphaTarget(.3).restart();d.fx=d.x;d.fy=d.y;}})
+      .on('drag',(ev,d)=>{{d.fx=ev.x;d.fy=ev.y;}})
+      .on('end',(ev,d)=>{{if(!ev.active)d2_sim.alphaTarget(0);if(!d.ext&&d.c!==1){{d.fx=null;d.fy=null;}}}}))
+    .on('click',(ev,d)=>{{
+      ev.stopPropagation();
+      const conn=new Set();links.forEach(l=>{{if(l.source.id===d.id)conn.add(l.target.id);if(l.target.id===d.id)conn.add(l.source.id);}});
+      const nc=links.filter(l=>l.source.id===d.id||l.target.id===d.id).length;
+      const aS=d.asm>0?` · <b>${{d.asm}}㎡</b> (${{(d.ar*100).toFixed(1)}}%)`:'';
+      const fS=d.ext?` · <span style="color:#1D9E75">ext [${{d._face||'?'}}]</span>`:'';
+      const vS=VERT_CONT[d.i]
+        ?` · <span style="color:#FF8C00">↕${{VERT_CONT[d.i]}}F physical</span>`
+        :VC_CLUSTER[d.i]
+          ?` · <span style="color:#3A8DDD">↕${{VC_CLUSTER[d.i]}}F cluster</span>`
+          :'';
+      document.getElementById('d2-info').innerHTML=`<b>${{d.e||d.i}}</b> · class ${{d.c}} · ${{nc}} connections${{aS}}${{fS}}${{vS}}`;
+      eS.attr('stroke-opacity',l=>(l.source.id===d.id||l.target.id===d.id)?1:.07);
+      nS.select('circle').attr('opacity',n=>n.id===d.id||conn.has(n.id)?1:.15);
+      rS.attr('opacity',n=>n.id===d.id||conn.has(n.id)?1:.12);
+    }});
+  svg.on('click',()=>{{eS.attr('stroke-opacity',d=>d.w>=0.9 ? 0.80 : d.w>=0.4 ? 0.62 : 0.38);nS.select('circle').attr('opacity',1);rS.attr('opacity',1);document.getElementById('d2-info').textContent='Click node for details · Orange dashed ring = vertical continuity · N/S/E/W compass layout';}});
+
+  nS.filter(d=>d.ext&&d._face).append('text').text(d=>d._face).attr('text-anchor','middle').attr('dy','-1.4em').attr('font-size',8).attr('fill','#aaa').attr('font-weight','700').attr('pointer-events','none');
+  nS.append('circle').attr('r',d=>nR2(d.ar,d.ext)).attr('fill',d=>nColor2(d.c,d.ext)).attr('fill-opacity',d=>d.ext ? 0.68 : 0.88).attr('stroke',d=>d.ext?'rgba(120,120,120,.5)':d.cr?'#CC0000':'rgba(255,255,255,.45)').attr('stroke-width',d=>d.cr?2.2:1.1).attr('stroke-dasharray',d=>d.ext?'4,2':null);
+  nS.append('text').text(d=>shortLbl(d.i)).attr('text-anchor','middle').attr('dy','.35em').attr('font-size',d=>d.c===1?11:9.5).attr('font-weight',d=>d.c===1?'bold':'normal').attr('fill','white').attr('pointer-events','none');
+  nS.filter(d=>!d.ext&&d.ar>=.08).append('text').text(d=>(d.ar*100).toFixed(0)+'%').attr('text-anchor','middle').attr('dy','1.55em').attr('font-size',7).attr('fill','rgba(255,255,255,.72)').attr('pointer-events','none');
+  d2_nS=nS;
+
+  const p=30;
+  d2_sim.on('tick',()=>{{
+    eS.attr('x1',d=>cl(d.source.x,p,W-p)).attr('y1',d=>cl(d.source.y,p,H-p)).attr('x2',d=>cl(d.target.x,p,W-p)).attr('y2',d=>cl(d.target.y,p,H-p));
+    nS.attr('transform',d=>`translate(${{cl(d.x,p,W-p)}},${{cl(d.y,p,H-p)}})`);
+    rS.attr('transform',d=>`translate(${{cl(d.x,p,W-p)}},${{cl(d.y,p,H-p)}})`);
+  }});
+  applyF();d2_sim.restart();
+}}
+function cl(v,lo,hi){{return Math.max(lo,Math.min(hi,v));}}
+
+// ═══════════════════════════════════════════════════════════════
+// ── 3D VIEW ────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+let d3_init=false;
+const SC=1/78,GAP=148;
+const FL_ALL=FLOORS.map(f=>f.raw);
+function getY(r){{return FL_ALL.indexOf(r)*GAP;}}
+const FV={{N:{{x:0,z:1}},S:{{x:0,z:-1}},E:{{x:1,z:0}},W:{{x:-1,z:0}}}};
+function fC3(f,o){{const d=FV[f];return new THREE.Vector3(d.x*o*SC,0,d.z*o*SC);}}
+function slabSz3(f,w){{const NS=f==='N'||f==='S';return NS?{{sw:(72*2+4)*SC,sd:w*SC}}:{{sw:w*SC,sd:(72*2+4)*SC}};}}
+function nClr3(c){{return parseInt((CLS_COLOR[c]||'#888888').replace('#','0x'));}}
+function getR3(ar){{return Math.max(.028,Math.min(.16,Math.sqrt(ar||.02)*.40));}}
+const GROUND3=new Set(FL_ALL.slice(0,Math.min(3,FL_ALL.length)));
+const PAPER_RX=0.25,PAPER_RY=0.42;
+const G3={{ext:[],cor:[],slab:[],he:[],ve:[],ce:[],lbl:[]}};\nlet NP=new Map(),EP=new Map(); // global for w=0 cluster script
+const FGO3={{}};
+let renderer3,cam3,scene3,pivot3,panG3,rY3=PAPER_RY,rX3=PAPER_RX,panX3=0,panY3=0;
+let clickable3=[];const lblM3=[];
+
+function initD3(){{
+  d3_init=true;
+  const canvas=document.getElementById('d3-canvas');
+  const W=canvas.parentElement.clientWidth||660,H=560;
+  canvas.width=W;canvas.height=H;
+  renderer3=new THREE.WebGLRenderer({{canvas,antialias:true,alpha:true}});
+  renderer3.setSize(W,H);renderer3.setPixelRatio(Math.min(devicePixelRatio,2));
+  renderer3.setClearColor(0,0);
+  scene3=new THREE.Scene();
+  cam3=new THREE.PerspectiveCamera(20,W/H,.1,500);
+  cam3.position.set(0,14,28);cam3.lookAt(0,7,0);
+  scene3.add(new THREE.AmbientLight(0xffffff,.9));
+  const sun=new THREE.DirectionalLight(0xffffff,.5);sun.position.set(6,14,8);scene3.add(sun);
+  const fl=new THREE.DirectionalLight(0xffffff,.22);fl.position.set(-5,4,-6);scene3.add(fl);
+  panG3=new THREE.Group();scene3.add(panG3);
+  pivot3=new THREE.Group();pivot3.rotation.set(PAPER_RX,PAPER_RY,0);panG3.add(pivot3);
+
+  // Build floor isolate buttons
+  const fiRow=document.getElementById('fi-row');
+  FLOORS.forEach(fl=>{{
+    const btn=document.createElement('button');
+    btn.className='fib';btn.id='fi-'+fl.raw;btn.textContent=fl.l;
+    btn.onclick=()=>iso3(fl.raw);fiRow.appendChild(btn);
+  }});
+
+  build3D();
+
+  // Controls
+  const c=canvas;
+  let mode='idle',lx=0,ly=0;
+  c.addEventListener('mousedown',e=>{{e.preventDefault();mode=(e.button===1||e.altKey)?'pan':'rotate';c.className=mode==='pan'?'pan':'drag';lx=e.clientX;ly=e.clientY;}},{{passive:false}});
+  window.addEventListener('mouseup',()=>{{mode='idle';c.className='';}});
+  c.addEventListener('mousemove',e=>{{if(mode==='idle')return;const dx=e.clientX-lx,dy=e.clientY-ly;if(mode==='rotate'){{rY3+=dx*.009;rX3+=dy*.007;rX3=Math.max(-.85,Math.min(.85,rX3));pivot3.rotation.set(rX3,rY3,0);}}else{{panX3+=dx*.006;panY3-=dy*.006;panG3.position.set(panX3,panY3,0);}}lx=e.clientX;ly=e.clientY;}});
+  c.addEventListener('wheel',e=>{{e.preventDefault();cam3.position.z=Math.max(5,Math.min(45,cam3.position.z+e.deltaY*.016));}},{{passive:false}});
+  let lastD=0,tM='r';
+  c.addEventListener('touchstart',e=>{{e.preventDefault();if(e.touches.length===1){{tM='r';lx=e.touches[0].clientX;ly=e.touches[0].clientY;}}else if(e.touches.length===2){{tM='p';lastD=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);}}}},{{passive:false}});
+  c.addEventListener('touchmove',e=>{{e.preventDefault();if(tM==='r'&&e.touches.length===1){{rY3+=(e.touches[0].clientX-lx)*.009;rX3+=(e.touches[0].clientY-ly)*.007;rX3=Math.max(-.85,Math.min(.85,rX3));pivot3.rotation.set(rX3,rY3,0);lx=e.touches[0].clientX;ly=e.touches[0].clientY;}}else if(tM==='p'&&e.touches.length===2){{const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);cam3.position.z=Math.max(5,Math.min(45,cam3.position.z-(d-lastD)*.04));lastD=d;}}}},{{passive:false}});
+  const ray=new THREE.Raycaster(),mp=new THREE.Vector2();
+  c.addEventListener('click',e=>{{const r=c.getBoundingClientRect();mp.x=((e.clientX-r.left)/r.width)*2-1;mp.y=-((e.clientY-r.top)/r.height)*2+1;ray.setFromCamera(mp,cam3);const hits=ray.intersectObjects(clickable3);if(hits.length){{const d=hits[0].object.userData;const aS=d.asm?` · <b>${{d.asm}}㎡</b> (${{(d.ar*100).toFixed(1)}}%)`:'';\ndocument.getElementById('d3-info').innerHTML=`<b>${{d.e}}</b> · ${{d.flLabel}}${{aS}}`+(d.cr?' <span style="color:#E42">●Core</span>':'');}}}});
+
+  const qC=new THREE.Quaternion();
+  (function loop(){{requestAnimationFrame(loop);cam3.getWorldQuaternion(qC);lblM3.forEach(m=>m.quaternion.copy(qC));renderer3.render(scene3,cam3);}})();
+}}
+
+function add3(o,b,raw){{pivot3.add(o);G3[b].push(o);if(raw){{if(!FGO3[raw])FGO3[raw]=[];FGO3[raw].push(o);}}}}
+function mL3(col,op=1){{return new THREE.MeshLambertMaterial({{color:col,transparent:op<1,opacity:op}});}}
+function lM3(col,op=1){{return new THREE.LineBasicMaterial({{color:col,transparent:op<1,opacity:op}});}}
+function eL3(geo,col,op){{return new THREE.LineSegments(new THREE.EdgesGeometry(geo),lM3(col,op));}}
+function bx3(w,h,d,col,op=1){{return new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mL3(col,op));}}
+function addEBox3(p1,p2,r1,r2,tk,col,op,bkt,raw){{
+  const dir=new THREE.Vector3().subVectors(p2,p1).normalize();
+  const len=p1.distanceTo(p2)-r1-r2;if(len<.005)return;
+  const mid=p1.clone().addScaledVector(dir,r1+len/2);
+  const m=new THREE.Mesh(new THREE.BoxGeometry(tk,tk,len),mL3(col,op));
+  m.position.copy(mid);m.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,1),dir);
+  add3(m,bkt,raw);}}
+
+function build3D(){{
+  const BH_w=(72*2)*SC;
+  NP=new Map();EP=new Map(); // reset globals
+  for(const fl of FLOORS){{
+    const fy=getY(fl.raw)*SC;
+    for(const n of fl.n){{
+      if(!n.ext)NP.set(fl.raw+'::'+n.i,new THREE.Vector3((n.x||0)*SC,fy,(n.z||0)*SC));
+      else{{const cp=fC3(n.face,n.off||84);EP.set(fl.raw+'::'+n.i,new THREE.Vector3(cp.x,fy,cp.z));}}
+    }}
+  }}
+
+  // Slabs
+  for(const fl of FLOORS){{
+    const fy=getY(fl.raw)*SC,isG=FL_ALL.indexOf(fl.raw)<3;
+    const th=isG ? 0.055 : 0.012,clr=isG?0x7A7060:0xBBBBCC,op=isG ? 0.76 : 0.07;
+    const s=bx3(BH_w,th,BH_w,clr,op);s.position.y=fy-th/2;add3(s,'slab',fl.raw);
+    const e=eL3(new THREE.BoxGeometry(BH_w,th,BH_w),isG?0x4A4030:0x8899BB,isG ? 0.68 : 0.24);
+    e.position.y=fy-th/2;add3(e,'slab',fl.raw);
+    const tc=document.createElement('canvas');tc.width=200;tc.height=30;
+    const ctx=tc.getContext('2d');ctx.fillStyle=isG?'rgba(65,58,44,.92)':'rgba(50,55,85,.86)';
+    if(ctx.roundRect)ctx.roundRect(0,0,200,30,5);else ctx.rect(0,0,200,30);
+    ctx.fill();ctx.fillStyle='#fff';ctx.font='bold 14px sans-serif';ctx.fillText(fl.l,7,21);
+    const lm=new THREE.MeshBasicMaterial({{map:new THREE.CanvasTexture(tc),transparent:true,side:THREE.DoubleSide}});
+    const lb=new THREE.Mesh(new THREE.PlaneGeometry(1.1,.18),lm);lb.position.set(-2.8,fy+.06,0);lb.userData.isLabel=1;add3(lb,'slab',fl.raw);G3.lbl.push(lb);
+  }}
+
+  // Context slabs — 레이어: 공지 → 도로 → 주변매스
+  for(const fl of FLOORS){{
+    const fy=getY(fl.raw)*SC,isGnd=GROUND3.has(fl.raw);
+    const fade=isGnd?1:Math.max(.12,1-.3*((getY(fl.raw)-getY(FL_ALL[0]))/GAP));
+    for(const n of fl.n){{
+      if(!n.ext||n.mass)continue;
+      const cp=EP.get(fl.raw+'::'+ n.i);if(!cp)continue;
+      const slbW=n.c===2?26.5:n.c===14?22:12.5;
+      const sz=slabSz3(n.face,slbW);
+      if(!n.viewOnly&&isGnd){{
+        let sc2,so,ec;
+        if(n.c===2){{sc2=0x0E0E0E;so=0.88;ec=0x000000;}}
+        else if(n.c===14){{sc2=0x3A3A3A;so=0.72;ec=0x222222;}}
+        else{{sc2=0x1D9E75;so=0.62;ec=0x0A6040;}}
+        const s2=bx3(sz.sw,.022,sz.sd,sc2,so);s2.position.set(cp.x,fy,cp.z);add3(s2,'ext',fl.raw);
+        const el2=eL3(new THREE.BoxGeometry(sz.sw,.022,sz.sd),ec,.82);el2.position.set(cp.x,fy,cp.z);add3(el2,'ext',fl.raw);
+        if(n.c===16||n.c===17){{
+          const NS=n.face==='N'||n.face==='S';
+          for(let i=-1;i<=1;i++){{
+            const dot=new THREE.Mesh(new THREE.CircleGeometry(.02,6),new THREE.MeshBasicMaterial({{color:0x0D7050,transparent:true,opacity:.55}}));
+            dot.rotation.x=-Math.PI/2;
+            dot.position.set(NS?cp.x+i*sz.sw*.28:cp.x,fy+.014,NS?cp.z:cp.z+i*sz.sd*.28);
+            add3(dot,'ext',fl.raw);
+          }}
+        }}
+        if(n.c===2||n.c===14){{
+          const NS2=n.face==='N'||n.face==='S';
+          const rt=document.createElement('canvas');
+          rt.width=NS2?128:32;rt.height=NS2?32:128;
+          const rc=rt.getContext('2d');
+          rc.fillStyle=n.c===2?'#111':'#3A3A3A';rc.fillRect(0,0,rt.width,rt.height);
+          rc.setLineDash(n.c===2?[8,6]:[6,5]);
+          rc.strokeStyle=n.c===2?'rgba(255,220,0,.70)':'rgba(180,180,180,.55)';
+          rc.lineWidth=n.c===2?2:1.5;rc.beginPath();
+          if(NS2){{rc.moveTo(rt.width/2,2);rc.lineTo(rt.width/2,rt.height-2);}}
+          else{{rc.moveTo(2,rt.height/2);rc.lineTo(rt.width-2,rt.height/2);}}
+          rc.stroke();rc.setLineDash([]);
+          const rm=new THREE.MeshBasicMaterial({{map:new THREE.CanvasTexture(rt),transparent:true,side:THREE.DoubleSide}});
+          const rp=new THREE.Mesh(new THREE.PlaneGeometry(sz.sw*.78,sz.sd*.78),rm);
+          rp.rotation.x=-Math.PI/2;rp.position.set(cp.x,fy+.013,cp.z);add3(rp,'ext',fl.raw);
+        }}
+        const ltc=document.createElement('canvas');ltc.width=150;ltc.height=22;
+        const lctx=ltc.getContext('2d');
+        const lbg=n.c===2?'rgba(8,8,8,.88)':n.c===14?'rgba(40,40,40,.82)':'rgba(10,100,60,.88)';
+        lctx.fillStyle=lbg;if(lctx.roundRect)lctx.roundRect(0,0,150,22,3);else lctx.rect(0,0,150,22);
+        lctx.fill();lctx.fillStyle='#fff';lctx.font='bold 10px sans-serif';
+        const lname={{2:'Main Road',14:'Sec.Road',16:'Open Space',17:'Green'}};
+        lctx.fillText((lname[n.c]||n.e||'Context')+' ['+n.face+']',4,15);
+        const llm=new THREE.MeshBasicMaterial({{map:new THREE.CanvasTexture(ltc),transparent:true,side:THREE.DoubleSide,depthTest:false}});
+        const llb=new THREE.Mesh(new THREE.PlaneGeometry(.66,.10),llm);
+        llb.position.set(cp.x,fy+.165,cp.z);llb.userData.isLabel=1;add3(llb,'ext',fl.raw);lblM3.push(llb);
+      }}
+      if(n.viewOnly){{
+        const d2=new THREE.Mesh(new THREE.SphereGeometry(.018,8,6),mL3(n.c===16||n.c===17?0x1D9E75:0x222222,.20*fade));
+        d2.position.set(cp.x,fy,cp.z);add3(d2,'ext',fl.raw);
+      }}
+    }}
+  }}
+  // Surrounding masses
+  const mRng={{}};
+  for(const fl of FLOORS){{for(const n of fl.n){{if(!n.mass)continue;const k=n.face;const fi=FL_ALL.indexOf(fl.raw);if(!mRng[k]){{mRng[k]={{from:fi,to:fi,off:n.off}};}}else{{mRng[k].from=Math.min(mRng[k].from,fi);mRng[k].to=Math.max(mRng[k].to,fi);}}}}}}
+  for(const [face,{{from,to,off}}] of Object.entries(mRng)){{
+    const cp=fC3(face,off);const mw=BH_w*.72;const h2=mw/2;
+    const yB=from*GAP*SC,yT=to*GAP*SC;const span=yT-yB+GAP*SC*.5,cy=(yB+yT)/2+GAP*SC*.25;
+    const grp=new THREE.Group();grp.add(bx3(mw,span,mw,0x888888,.05));
+    const sfls=[];for(let i=from;i<=to;i++)sfls.push(i);
+    for(const i of sfls){{const ly=i*GAP*SC-cy;const sl=new THREE.Mesh(new THREE.BoxGeometry(mw,.015,mw),new THREE.MeshBasicMaterial({{color:0x333333,wireframe:true,opacity:.55,transparent:true}}));sl.position.y=ly;grp.add(sl);}}
+    for(const [cx,cz] of [[-h2,-h2],[h2,-h2],[h2,h2],[-h2,h2]]){{const geo=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(cx,-span/2,cz),new THREE.Vector3(cx,span/2,cz)]);grp.add(new THREE.Line(geo,lM3(0x333333,.58)));}}
+    grp.add(eL3(new THREE.BoxGeometry(mw,span,mw),0x444444,.60));grp.position.set(cp.x,cy,cp.z);add3(grp,'ext','_mass_'+face);
+  }}
+
+  // Core boxes
+  for(const seg of CORE_SEGS){{
+    const yB=FL_ALL.indexOf(seg.from)*GAP*SC,yT=FL_ALL.indexOf(seg.to)*GAP*SC+GAP*SC*.38;
+    const span=yT-yB,cy=(yB+yT)/2;const grp=new THREE.Group();
+    grp.add(bx3(seg.bw,span,seg.bd,0xFF2222,.14));grp.add(eL3(new THREE.BoxGeometry(seg.bw,span,seg.bd),0xCC0000,.88));
+    for(let i=FL_ALL.indexOf(seg.from);i<=FL_ALL.indexOf(seg.to);i++){{const ring=bx3(seg.bw+.005,.008,seg.bd+.005,0xFF2222,.68);ring.position.y=i*GAP*SC-cy;grp.add(ring);}}
+    grp.position.set(seg.x*SC,cy,seg.z*SC);grp.userData={{e:seg.label,c:seg.cls,cr:1}};add3(grp,'cor',null);
+    const ctc=document.createElement('canvas');ctc.width=180;ctc.height=24;const cctx=ctc.getContext('2d');cctx.fillStyle='rgba(160,10,10,.88)';if(cctx.roundRect)cctx.roundRect(0,0,180,24,4);else cctx.rect(0,0,180,24);cctx.fill();cctx.fillStyle='#fff';cctx.font='bold 11px sans-serif';cctx.fillText(seg.label,5,17);
+    const clm=new THREE.MeshBasicMaterial({{map:new THREE.CanvasTexture(ctc),transparent:true,side:THREE.DoubleSide,depthTest:false}});
+    const clb=new THREE.Mesh(new THREE.PlaneGeometry(.76,.108),clm);clb.position.set(seg.x*SC+.12,yT+.16,seg.z*SC);clb.userData.isLabel=1;add3(clb,'lbl',null);lblM3.push(clb);
+  }}
+
+  // MEP V-edges
+  {{const pts=[];for(const [sf,sn,tn] of VMEP){{const sp=NP.get(sf+'::'+sn);if(!sp)continue;let tp=null;for(const fl of FLOORS){{const p=NP.get(fl.raw+'::'+tn);if(p&&Math.abs(p.y-sp.y)>.04){{tp=p;break;}}}}if(!tp)continue;pts.push(sp.x,sp.y,sp.z,tp.x,tp.y,tp.z);}}
+  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pts,3));add3(new THREE.LineSegments(g,lM3(0xCC5599,.55)),'ve',null);}}
+
+  // Programmatic cluster V-edges (w=0) — 파랑 점선
+  {{const pts2=[];for(const [sf,sn,tn] of VMEP_CLUSTER){{
+    const sp=NP.get(sf+'::'+ sn);if(!sp)continue;
+    let tp=null;
+    for(const fl of FLOORS){{const p=NP.get(fl.raw+'::'+ tn);if(p&&Math.abs(p.y-sp.y)>.04){{tp=p;break;}}}}
+    if(!tp)continue;
+    pts2.push(sp.x,sp.y,sp.z,tp.x,tp.y,tp.z);
+  }}
+  if(pts2.length>0){{
+    const g2=new THREE.BufferGeometry();g2.setAttribute('position',new THREE.Float32BufferAttribute(pts2,3));
+    const mat2=new THREE.LineDashedMaterial({{color:0x3A8DDD,transparent:true,opacity:0.55,dashSize:.10,gapSize:.07}});
+    const ls2=new THREE.LineSegments(g2,mat2);ls2.computeLineDistances();
+    add3(ls2,'ve',null);
+  }}}}
+
+  // Context edges (ground only)
+  for(const fl of FLOORS){{if(!GROUND3.has(fl.raw))continue;const fy=getY(fl.raw)*SC;
+    for(const n of fl.n){{if(!n.ext||n.mass)continue;const ep=EP.get(fl.raw+'::'+n.i);if(!ep)continue;
+      for(const [s,t,w] of fl.e){{if(s!==n.i&&t!==n.i)continue;const oid=s===n.i?t:s;const tp=NP.get(fl.raw+'::'+oid);if(!tp)continue;
+        const lc=n.c===2?0x111111:0x0D7050;add3(new THREE.Line(new THREE.BufferGeometry().setFromPoints([ep.clone(),tp.clone()]),lM3(lc,w>=0.7 ? 0.55 : 0.28)),'ce',fl.raw);
+      }}
+    }}
+  }}
+
+  // H-edges
+  for(const fl of FLOORS){{
+    const nm=new Map(fl.n.filter(n=>!n.ext).map(n=>[n.i,NP.get(fl.raw+'::'+n.i)]).filter(([,p])=>p));
+    const rm=new Map(fl.n.filter(n=>!n.ext).map(n=>[n.i,getR3(n.ar||.02)]));
+    const dp=[];
+    for(const [s,t,w] of fl.e){{const sp=nm.get(s),tp=nm.get(t);if(!sp||!tp)continue;const r1=rm.get(s)||.04,r2=rm.get(t)||.04;
+      if(w>=.9)addEBox3(sp,tp,r1,r2,.020,0xFF7700,.83,'he',fl.raw);
+      else if(w>=.4)addEBox3(sp,tp,r1,r2,.012,0x3A8DDD,.66,'he',fl.raw);
+      else{{const dir=new THREE.Vector3().subVectors(tp,sp).normalize();const len=sp.distanceTo(tp)-r1-r2;if(len<.005)continue;const ps=sp.clone().addScaledVector(dir,r1),pe=tp.clone().addScaledVector(dir,-r2);dp.push(ps.x,ps.y,ps.z,pe.x,pe.y,pe.z);}}
+    }}
+    if(dp.length){{const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(dp,3));const sg=new THREE.LineSegments(g,new THREE.LineDashedMaterial({{color:0xAA88CC,transparent:true,opacity:.52,dashSize:.07,gapSize:.05}}));sg.computeLineDistances();add3(sg,'he',fl.raw);}}
+  }}
+
+  // Nodes
+  for(const fl of FLOORS){{for(const n of fl.n){{if(n.ext)continue;const p=NP.get(fl.raw+'::'+n.i);if(!p)continue;
+    const m=new THREE.Mesh(new THREE.SphereGeometry(getR3(n.ar||.02),14,10),mL3(nClr3(n.c)));
+    m.position.copy(p);m.userData={{...n,flLabel:fl.l,flRaw:fl.raw}};add3(m,'he',fl.raw);clickable3.push(m);
+  }}}}
+
+  // Labels (selected floors only)
+  const labelFls=new Set([FL_ALL[0],FL_ALL[Math.floor(FL_ALL.length/2)],FL_ALL[FL_ALL.length-1]]);
+  for(const fl of FLOORS){{if(!labelFls.has(fl.raw))continue;
+    const lu=fl.n.find(n=>n.c===1&&!n.ext);if(!lu)continue;const p=NP.get(fl.raw+'::'+lu.i);if(!p)continue;
+    const r=getR3(lu.ar||.02);
+    const lb=mkLbl3('Leasable',`${{lu.asm}}㎡·${{(lu.ar*100).toFixed(0)}}%·${{fl.l}}`,'rgba(18,72,160,.90)');
+    lb.position.set(p.x,p.y+r+.16,p.z);lb.userData.isLabel=1;add3(lb,'lbl',fl.raw);lblM3.push(lb);
+  }}
+
+
+  // w=0 programmatic cluster → 파랑 점선 수직선 (NP 채워진 직후)
+  (function(){{
+    const _cx={{}};
+    FLOORS.forEach(function(fl){{
+      fl.n.forEach(function(n){{
+        if(n.ext||!VC_CLUSTER[n.i])return;
+        const p=NP.get(fl.raw+'::'+n.i);
+        if(p){{_cx[n.i]=_cx[n.i]||[];_cx[n.i].push({{x:p.x,y:p.y,z:p.z}});}}
+      }});
+    }});
+    Object.keys(_cx).forEach(function(nid){{
+      const pts=_cx[nid];if(pts.length<2)return;
+      pts.sort(function(a,b){{return a.y-b.y;}});
+      const g=new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(pts[0].x,pts[0].y,pts[0].z),
+        new THREE.Vector3(pts[pts.length-1].x,pts[pts.length-1].y,pts[pts.length-1].z)]);
+      const m=new THREE.LineDashedMaterial({{color:0x3A8DDD,transparent:true,opacity:0.42,dashSize:.10,gapSize:.07}});
+      const ln=new THREE.Line(g,m);ln.computeLineDistances();
+      pivot3.add(ln);G3.ve.push(ln);
+    }});
+  }})();
+}}
+
+function mkLbl3(txt,sub,bg){{
+  const hs=sub&&sub.length;const tc=document.createElement('canvas');tc.width=200;tc.height=hs?40:27;
+  const ctx=tc.getContext('2d');ctx.fillStyle=bg;if(ctx.roundRect)ctx.roundRect(0,0,200,hs?40:27,5);else ctx.rect(0,0,200,hs?40:27);
+  ctx.fill();ctx.fillStyle='#fff';ctx.font='bold 11px sans-serif';ctx.fillText(txt,6,17);
+  if(hs){{ctx.font='10px sans-serif';ctx.fillStyle='rgba(255,255,255,.75)';ctx.fillText(sub,6,30);}}
+  const mat=new THREE.MeshBasicMaterial({{map:new THREE.CanvasTexture(tc),transparent:true,side:THREE.DoubleSide,depthTest:false}});
+  return new THREE.Mesh(new THREE.PlaneGeometry(.76,hs ? 0.14 : 0.095),mat);}}
+
+function tog3(k){{const on=document.getElementById('b-'+k).classList.toggle('on');G3[k].forEach(o=>{{o.visible=on;o.traverse&&o.traverse(c=>{{c.visible=on;}});}});}}
+function setFlOp3(raw,op){{if(!FGO3[raw])return;FGO3[raw].forEach(o=>{{o.traverse(ch=>{{if(ch.material){{if(!ch.userData._bOp)ch.userData._bOp=ch.material.opacity||1;ch.material.opacity=ch.userData._bOp*op;ch.material.transparent=op<1;}}}})}})}}
+function iso3(raw){{
+  document.querySelectorAll('.fib').forEach(b=>b.classList.remove('active'));
+  const _fiBtn=document.getElementById(raw==='all'?'fi-all':'fi-'+raw);if(_fiBtn)_fiBtn.classList.add('active');
+  if(raw==='all'){{
+    FLOORS.forEach(f=>setFlOp3(f.raw,1));
+    // 주변매스: 항상 표시
+    ['N','S','E','W'].forEach(face=>setFlOp3('_mass_'+face,1));
+  }} else {{
+    FLOORS.forEach(f=>setFlOp3(f.raw,f.raw===raw?1:.12));
+    // 주변매스: 해당 층이 포함된 방향은 표시, 아닌 건 fade
+    // (주변매스는 층 범위로 집계됐으므로 근사: raw가 GROUND3에 있으면 표시)
+    const showMass=GROUND3.has(raw)||FL_ALL.indexOf(raw)<4;
+    ['N','S','E','W'].forEach(face=>setFlOp3('_mass_'+face,showMass?0.85:.08));
+  }}
+  document.getElementById('d3-info').innerHTML=raw==='all'?'Click node for details · 📐 locks to paper figure angle':`<b>Floor isolate: ${{(FLOORS.find(f=>f.raw===raw)||{{}}).l||raw}}</b>`;}}
+function setPV(){{rX3=PAPER_RX;rY3=PAPER_RY;pivot3.rotation.set(rX3,rY3,0);panX3=0;panY3=0;panG3.position.set(0,0,0);document.getElementById('d3-info').innerHTML='📐 Paper View — matches publication figure angle';}}
+function rst3(){{setPV();iso3('all');}}
+</script>
+</body>
+</html>
+"""
+
+
+# ── Main generator ────────────────────────────────────────────────────────────
+def generate_viewer(building_dir: Path, output_dir: Path):
+    bd = building_dir
+    print(f"  Processing: {bd.name}")
+
+    # Load JSON
+    h = json.loads((bd/"horizontal_graph.json").read_text(encoding="utf-8"))
+    v = json.loads((bd/"vertical_graph.json").read_text(encoding="utf-8"))
+    a = json.loads((bd/"area_ratios.json").read_text(encoding="utf-8"))
+    m = json.loads((bd/"metadata.json").read_text(encoding="utf-8"))
+
+    building_id = m["building_id"]
+    fl_labels = m.get("floor_labels", [f["floor_label"] for f in h])
+
+    # Compute layouts
+    floor_layouts, _ = compute_layouts(h, v)
+
+    # Face assignment
+    EXT_FACE = compute_faces(h, floor_layouts)
+    EXT_OFF = {}
+    ground_fl = next((f for f in h if f["floor_label"] in ["1","B1"]), h[0])
+    ext_1f = [n for n in ground_fl["nodes"] if n["is_external_context"]]
+    fg = defaultdict(list)
+    for n in ext_1f:
+        face2 = EXT_FACE.get(n["id"],"N")
+        fg[face2].append((LAYER_ORD.get(n["class_id"],0),n["class_id"],n["instance_index"],n["id"]))
+    for face2,items in fg.items():
+        items.sort(); off=72
+        for _,cls,_n,nid in items:
+            w=SLAB_W.get(cls,25); off+=w/2; EXT_OFF[nid]=round(off,1); off+=w/2
+
+    # Build data
+    floors_js = build_floors_js(h, a, floor_layouts, EXT_FACE, EXT_OFF)
+    core_segs = compute_core_segs(h, v, floor_layouts)
+    vmep           = compute_vmep(v)
+    vmep_cluster   = compute_vmep_cluster(v)
+    vc_physical, vc_cluster = compute_vert_cont(h, v)
+    vert_cont = vc_physical  # backward compat
+    stats, cls_global = build_stats(h, a, m)
+
+    # Area lookup for floors_js (add area field)
+    for i,fl in enumerate(floors_js):
+        fl["area"] = stats[i]["total_area"]
+
+    # Title
+    title = f"{building_id} — Spatial Relationship Graph"
+    num_floors  = m.get("num_floors",len(h))
+    total_nodes = m.get("total_nodes",0)
+    total_hedges= m.get("total_horizontal_edges",0)
+    total_vedges= m.get("total_vertical_edges",0)
+
+    # JSON encode
+    def je(obj): return json.dumps(obj, ensure_ascii=False, separators=(',',':'))
+
+    # CLS maps (only keys as strings for JS)
+    cls_color_js = {str(k):v for k,v in CLS_COLOR.items()}
+    cls_label_js = {str(k):v for k,v in CLS_LABEL_EN.items()}
+    vc_str = {k:v for k,v in vert_cont.items()}
+
+    html = HTML_TEMPLATE
+    subs = {
+        "__TITLE__":          title,
+        "__NUM_FLOORS__":     str(num_floors),
+        "__TOTAL_NODES__":    str(total_nodes),
+        "__TOTAL_HEDGES__":   str(total_hedges),
+        "__TOTAL_VEDGES__":   str(total_vedges),
+        "__METADATA_JSON__":  je(m),
+        "__FLOORS_JSON__":    je(floors_js),
+        "__CORE_SEGS_JSON__": je(core_segs),
+        "__VMEP_JSON__":          je(vmep),
+        "__VMEP_CLUSTER_JSON__":  je(vmep_cluster),
+        "__VERT_CONT_JSON__":    je(vc_str),
+        "__VC_CLUSTER_JSON__":  je({k:v for k,v in vc_cluster.items()}),
+        "__STATS_JSON__":     je(stats),
+        "__CLS_GLOBAL_JSON__":je({str(k):round(v,1) for k,v in cls_global.items()}),
+        "__CLS_COLOR_JSON__": je(cls_color_js),
+        "__CLS_LABEL_JSON__": je(cls_label_js),
+    }
+    # Convert escaped braces BEFORE data injection (to not touch JSON data)
+    html = html.replace('{{', '<<<LB>>>').replace('}}', '<<<RB>>>')
+    html = html.replace('<<<LB>>>', '{').replace('<<<RB>>>', '}')
+    # Inject data (JSON already has correct single braces)
+    for k,v in subs.items():
+        html = html.replace(k, v)
+
+    out_path = output_dir / f"{building_id}_viewer.html"
+    output_dir.mkdir(parents=True, exist_ok=True)
+    out_path.write_text(html, encoding="utf-8")
+    print(f"  ✅ Saved: {out_path}  ({len(html)//1024}KB)")
+    return str(out_path)
+
+
+# ── CLI ───────────────────────────────────────────────────────────────────────
+def main():
+    parser = argparse.ArgumentParser(
+        description="ATLAS JSON → Self-contained HTML Viewer (2D + 3D)")
+    parser.add_argument("--input",  required=True,
+        help="Building JSON directory (contains *_graph.json)")
+    parser.add_argument("--output", default="./viewers",
+        help="Output directory (default: ./viewers)")
+    args = parser.parse_args()
+
+    generate_viewer(Path(args.input), Path(args.output))
+    print("\nDone. Open the HTML file in any browser — no server needed.")
+
+
+if __name__ == "__main__":
+    main()
