@@ -1,9 +1,18 @@
 # ATLAS — Spatial Layout Alternative Generation Model
-| 📊 Overview | 🔵 2D Graph | 📐 3D View |
-|:---:|:---:|:---:|
-| ![Overview](assets/overview.png) | ![2D Graph](assets/2d.png) | ![3D View](assets/3d.png) |
+
+### Preview
+
+**📊 Overview**
+![Overview](assets/overview.png)
+
+**🔵 2D Graph**
+![2D Graph](assets/2d.png)
+
+**📐 3D View**
+![3D View](assets/3d.png)
 
 🔗 **[Live Demo — Interactive Viewer](https://hmgu01.github.io/ATLAS-dataset/viewers/building_001_viewer.html)**
+
 ### Dataset & Visualization Tools
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19225225.svg)](https://doi.org/10.5281/zenodo.19225225)
